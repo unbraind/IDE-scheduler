@@ -48,4 +48,4 @@ Roo Scheduler connects with [Roo Code](https://roocode.com/)'s extension points 
 
 [Apache 2.0 © 2025 Roo Scheduler, Inc.](./LICENSE)
 
-Note: This project is maintained by a [Roo Code](https://roocode.com/) fan/contributor rather than the [Roo Code](https://roocode.com/) team.  Feel free to suggest features/ideas/fixes via an issue or contribute to the project!
+Note: This project is maintained by a [Roo Code](https://roocode.com/) fan/contributor rather than the [Roo Code](https://roocode.com/) team.  Feel free to suggest features/ideas/fixes via an issue or [contribute to the project](CONTRIBUTING.md)!

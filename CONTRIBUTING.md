@@ -2,6 +2,10 @@
 
 Roo Scheduler is a simple app, but it was built from a Roo Code fork as the starter, so there's plenty of code to ignore.  Feel free to add any features or fixes you think would be useful.
 
+You'll find the code for this extension primarily in:
+- src/services/scheduler
+- webview-ui/src/components/scheduler
+
 ## Join The Roo Code Community
 
 We strongly encourage all contributors to join our [Discord community](https://discord.gg/roocode)! Being part of our Discord server helps you:
