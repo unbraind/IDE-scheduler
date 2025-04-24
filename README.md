@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://kylehoskinswebsite.s3.us-east-2.amazonaws.com/RooSchedulerPreview.png" alt="Roo Scheduler Icon" width="600" />
+  <img src="https://kylehoskinswebsite.s3.us-east-2.amazonaws.com/RooSchedulerPreview.png?v=2" alt="Roo Scheduler Icon" width="600" />
 </div>
 
 <div align="center">
