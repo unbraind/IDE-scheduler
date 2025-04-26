@@ -84,7 +84,10 @@
 			{
 				"command": "roo-scheduler.openRooClineExtension",
 				"title": "Open Roo Code Extension",
-				"icon": "assets/icons/icon.svg"
+				"icon": {
+					"light": "assets/icons/roo-icon-black.svg",
+					"dark": "assets/icons/roo-icon-white.svg"
+				}
 			}
 		],
 		"menus": {
@@ -100,45 +103,6 @@
 					"when": "view == roo-scheduler.SidebarProvider"
 				}
 			]
-		},
-		"configuration": {
-			"title": "Roo Scheduler",
-			"properties": {
-				"roo-scheduler.allowedCommands": {
-					"type": "array",
-					"items": {
-						"type": "string"
-					},
-					"default": [
-						"npm test",
-						"npm install",
-						"tsc",
-						"git log",
-						"git diff",
-						"git show"
-					],
-					"description": "Commands that can be auto-executed when 'Always approve execute operations' is enabled"
-				},
-				"roo-scheduler.vsCodeLmModelSelector": {
-					"type": "object",
-					"properties": {
-						"vendor": {
-							"type": "string",
-							"description": "The vendor of the language model (e.g. copilot)"
-						},
-						"family": {
-							"type": "string",
-							"description": "The family of the language model (e.g. gpt-4)"
-						}
-					},
-					"description": "Settings for VSCode Language Model API"
-				},
-				"roo-scheduler.customStoragePath": {
-					"type": "string",
-					"default": "",
-					"description": "Custom storage path. Leave empty to use the default location. Supports absolute paths (e.g. 'D:\\RooCodeStorage')"
-				}
-			}
 		}
 	},
 	"scripts": {
