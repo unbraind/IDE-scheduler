@@ -45,14 +45,27 @@ export class KiloCodeAdapter implements ISchedulerAdapter {
   async triggerAgent(opts: TriggerOptions): Promise<void> {
     // Fire a command or message that Kilo Code understands. For now, focus the sidebar and send a hint.
     try {
-      await vscode.commands.executeCommand('kilo-scheduler.SidebarProvider.focus')
+      try {
+        await vscode.commands.executeCommand('agent-scheduler.SidebarProvider.focus')
+      } catch {
+        await vscode.commands.executeCommand('kilo-scheduler.SidebarProvider.focus')
+      }
       // Send a message to our webview if available (best-effort)
-      await vscode.commands.executeCommand('kilo-scheduler.handleHumanRelayResponse', {
+      try {
+        await vscode.commands.executeCommand('agent-scheduler.handleHumanRelayResponse', {
+          action: 'triggerAgent',
+          mode: opts.mode,
+          instructions: opts.instructions,
+          metadata: opts.metadata,
+        })
+      } catch {
+        await vscode.commands.executeCommand('kilo-scheduler.handleHumanRelayResponse', {
         action: 'triggerAgent',
         mode: opts.mode,
         instructions: opts.instructions,
         metadata: opts.metadata,
-      })
+        })
+      }
     } catch (e) {
       // Swallow failures gracefully; this is experimental
       console.warn('KiloCodeAdapter.triggerAgent failed', e)

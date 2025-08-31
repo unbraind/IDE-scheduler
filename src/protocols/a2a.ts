@@ -1,4 +1,5 @@
 import * as vscode from 'vscode'
+import { getSetting } from '../utils/config'
 import { SchedulerAdapterRegistry } from '../services/scheduler/adapters'
 import { sendA2AOverMCP } from '../integrations/mcp/bridge'
 
@@ -56,7 +57,7 @@ function configKeyForAdapter(adapterId: string): string {
 }
 
 export async function handleA2ATrigger(msg: A2AMessage | any): Promise<any> {
-  const enabled = vscode.workspace.getConfiguration('kilo-scheduler').get<boolean>('experimental.crossIde') ?? false
+  const enabled = (getSetting<boolean>('experimental.crossIde') ?? false)
   if (!enabled) {
     vscode.window.showInformationMessage('A2A trigger ignored: cross-IDE experimental features are disabled.')
     return undefined
@@ -76,7 +77,7 @@ export async function handleA2ATrigger(msg: A2AMessage | any): Promise<any> {
   if (!adapter) return { ok: false, error: 'no-adapter' }
 
   // Check per-adapter allowedActions from configuration
-  const cfg = vscode.workspace.getConfiguration('kilo-scheduler')
+  const cfg = vscode.workspace.getConfiguration('agent-scheduler')
   const key = configKeyForAdapter(adapter.id)
   const configured = cfg.get<string[]>(`experimental.agents.${key}.allowedActions`)
   const allowed = configured ?? (adapter.id === 'kilocode' ? ['trigger','list','setActive'] : ['trigger'])

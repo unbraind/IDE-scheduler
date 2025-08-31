@@ -904,19 +904,34 @@ export const webviewMessageHandler = async (provider: any, message: WebviewMessa
 			break
 		case "humanRelayResponse":
 			if (message.requestId && message.text) {
-				vscode.commands.executeCommand("kilo-scheduler.handleHumanRelayResponse", {
+				try {
+					await vscode.commands.executeCommand("agent-scheduler.handleHumanRelayResponse", {
+						requestId: message.requestId,
+						text: message.text,
+						cancelled: false,
+					})
+				} catch {
+					vscode.commands.executeCommand("kilo-scheduler.handleHumanRelayResponse", {
 					requestId: message.requestId,
 					text: message.text,
 					cancelled: false,
 				})
+				}
 			}
 			break
 case "humanRelayCancel":
 	if (message.requestId) {
+	try {
+		await vscode.commands.executeCommand("agent-scheduler.handleHumanRelayResponse", {
+			requestId: message.requestId,
+			cancelled: true,
+		})
+	} catch {
 		vscode.commands.executeCommand("kilo-scheduler.handleHumanRelayResponse", {
 			requestId: message.requestId,
 			cancelled: true,
 		})
+	}
 	}
 	break
 

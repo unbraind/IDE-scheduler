@@ -103,7 +103,11 @@ export class SchedulerService {
     // Notify that schedules have been updated by triggering a command
     // This will cause the webview to refresh its data
     try {
-      await vscode.commands.executeCommand('kilo-scheduler.schedulesUpdated');
+      try {
+        await vscode.commands.executeCommand('agent-scheduler.schedulesUpdated');
+      } catch {
+        await vscode.commands.executeCommand('kilo-scheduler.schedulesUpdated');
+      }
     } catch (error) {
       this.log(`Error notifying webview of schedule update: ${error instanceof Error ? error.message : String(error)}`);
     }

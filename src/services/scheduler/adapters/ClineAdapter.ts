@@ -12,7 +12,7 @@ export class ClineAdapter implements ISchedulerAdapter {
   private listId: string | null = null
 
   async initialize(_context: vscode.ExtensionContext): Promise<void> {
-    const cfg = vscode.workspace.getConfiguration('kilo-scheduler')
+    const cfg = vscode.workspace.getConfiguration('agent-scheduler')
     this.triggerId = cfg.get<string>('experimental.agents.cline.triggerCommand') ?? 'cline.newTask'
     this.listId = cfg.get<string>('experimental.agents.cline.listCommand') ?? null
   }
@@ -39,7 +39,7 @@ export class ClineAdapter implements ISchedulerAdapter {
 
   async triggerAgent(_opts: TriggerOptions): Promise<void> {
     try {
-      const cfg = vscode.workspace.getConfiguration('kilo-scheduler')
+      const cfg = vscode.workspace.getConfiguration('agent-scheduler')
       const triggerId = this.triggerId || cfg.get<string>('experimental.agents.cline.triggerCommand') || 'cline.newTask'
       const payload = {
         instructions: _opts.instructions,

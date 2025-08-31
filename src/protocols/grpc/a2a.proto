@@ -1,0 +1,23 @@
+syntax = "proto3";
+package a2a.v1;
+
+import "google/protobuf/struct.proto";
+
+message A2AMessage {
+  string protocol = 1; // should be "a2a"
+  string version = 2;  // protocol version string, e.g., "1"
+  string targetAgent = 3; // normalized agent id (e.g., "kilocode", "cline")
+  string action = 4; // trigger|list|setActive
+  google.protobuf.Struct payload = 5; // additional params by action
+}
+
+message A2AResult {
+  bool ok = 1;
+  string error = 2;
+  google.protobuf.Struct data = 3; // optional data (e.g., list results)
+}
+
+service A2AService {
+  rpc Invoke (A2AMessage) returns (A2AResult);
+}
+

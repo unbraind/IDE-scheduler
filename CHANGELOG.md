@@ -1,5 +1,35 @@
 # Changelog
 
+## [0.0.15] - 2025-08-31
+
+### Added
+- AgentScheduler namespace migration (contributes and commands):
+  - New views container `agent-scheduler-ActivityBar` and view `agent-scheduler.SidebarProvider`.
+  - New commands: `agent-scheduler.reloadWindowDev`, `agent-scheduler.openAgentScheduler`, `agent-scheduler.a2a.trigger`, `agent-scheduler.a2a.sample`.
+  - New experimental command: `agent-scheduler.grpc.invoke` for quick manual gRPC A2A calls.
+- Configuration (AgentScheduler prefix retained alongside legacy):
+  - `agent-scheduler.experimental.activityBadge`: toggle Activity Bar badge.
+  - `agent-scheduler.experimental.crossIde`: enable cross‑IDE Agent‑to‑Agent (A2A).
+  - MCP forwarding scaffold: `agent-scheduler.experimental.mcp.enabled`, `...mcp.forward`, `...mcp.endpoint`.
+  - gRPC A2A (experimental): `agent-scheduler.experimental.grpc.enabled`, `...grpc.host`, `...grpc.port`, `...grpc.client.enabled`, `...grpc.client.target`.
+  - Per‑agent wiring: `agent-scheduler.experimental.agents.<agent>.enabled`, `.allowedActions`, and for Cline: `.triggerCommand`, `.listCommand`.
+- gRPC A2A server/client scaffolding:
+  - Proto: `src/protocols/grpc/a2a.proto` (service a2a.v1.A2AService Invoke(A2AMessage)→A2AResult).
+  - Server: `src/protocols/grpc/server.ts` binds to configurable host/port and routes to A2A handler.
+  - Client: `src/protocols/grpc/client.ts` for outbound Invoke calls (feature‑flagged).
+  - Packaging: `.proto` files copied into `dist/protocols/grpc` via esbuild.
+- MCP endpoint scaffolding: `src/integrations/mcp/server.ts` (exposes `a2a.invoke` tool when SDK supports it; feature‑flagged).
+- Dynamic agent command discovery: `src/services/scheduler/AgentCommandMapper.ts` scans installed extensions to heuristically map trigger/list commands for known agents and stores in settings if unset.
+
+### Changed
+- Configuration title changed to "Agent Scheduler". Legacy `kilo-scheduler.*` settings remain readable for backward compatibility while new `agent-scheduler.*` settings are introduced.
+- Renamed UI ids and menus to `agent-scheduler.*`. Code now focuses the new view first and falls back to legacy ids when needed.
+- Updated A2A handler and MCP bridge to read new settings via a unified config helper (`src/utils/config.ts`).
+- Scheduler update command renamed to `agent-scheduler.schedulesUpdated` with a fallback to the legacy command.
+
+### Notes
+- This release focuses on scaffolding and configuration wiring for A2A gRPC and MCP, plus contributes id migration. The MCP endpoint is intentionally minimal and guarded by settings until full transport/runtime semantics are finalized.
+
 ## [0.0.14] - 2025-08-31
 
 ### Fixed

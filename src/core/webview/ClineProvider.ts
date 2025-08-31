@@ -48,8 +48,8 @@ export type ClineProviderEvents = {
 }
 
 export class ClineProvider extends EventEmitter<ClineProviderEvents> implements vscode.WebviewViewProvider {
-	public static readonly sideBarId = "kilo-scheduler.SidebarProvider" // used in package.json as the view's id.
-	public static readonly tabPanelId = "kilo-scheduler.TabPanelProvider"
+	public static readonly sideBarId = "agent-scheduler.SidebarProvider" // used in package.json as the view's id.
+	public static readonly tabPanelId = "agent-scheduler.TabPanelProvider"
 	private static activeInstances: Set<ClineProvider> = new Set()
 	private disposables: vscode.Disposable[] = []
 	private view?: vscode.WebviewView | vscode.WebviewPanel
@@ -211,7 +211,11 @@ export class ClineProvider extends EventEmitter<ClineProviderEvents> implements 
 
 		// If no visible provider, try to show the sidebar view
 		if (!visibleProvider) {
-			await vscode.commands.executeCommand("kilo-scheduler.SidebarProvider.focus")
+			try {
+				await vscode.commands.executeCommand("agent-scheduler.SidebarProvider.focus")
+			} catch {
+				await vscode.commands.executeCommand("kilo-scheduler.SidebarProvider.focus")
+			}
 			// Wait briefly for the view to become visible
 			await delay(100)
 			visibleProvider = ClineProvider.getVisibleInstance()

@@ -114,12 +114,28 @@ function setupLocaleWatcher() {
 }
 
 const copyLocalesFiles = {
-	name: "copy-locales-files",
-	setup(build) {
-		build.onEnd(() => {
-			copyLocaleFiles()
-		})
-	},
+    name: "copy-locales-files",
+    setup(build) {
+        build.onEnd(() => {
+            copyLocaleFiles()
+            // Also copy proto definitions for gRPC runtime loading
+            try {
+                const srcProtoDir = path.join(__dirname, 'src', 'protocols', 'grpc')
+                const distProtoDir = path.join(__dirname, 'dist', 'protocols', 'grpc')
+                if (fs.existsSync(srcProtoDir)) {
+                    fs.mkdirSync(distProtoDir, { recursive: true })
+                    for (const f of fs.readdirSync(srcProtoDir)) {
+                        if (f.endsWith('.proto')) {
+                            fs.copyFileSync(path.join(srcProtoDir, f), path.join(distProtoDir, f))
+                        }
+                    }
+                    console.log('Copied proto files to dist/protocols/grpc')
+                }
+            } catch (e) {
+                console.warn('Failed to copy proto files:', e?.message)
+            }
+        })
+    },
 }
 
 const extensionConfig = {

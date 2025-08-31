@@ -23,6 +23,9 @@ import { migrateSettings } from "./utils/migrateSettings"
 import { formatLanguage } from "./shared/language"
 import { ClineProvider } from "./core/webview/ClineProvider"
 import { SchedulerAdapterRegistry } from "./services/scheduler/adapters"
+import { startA2AGrpcServer } from './protocols/grpc/server'
+import { invokeA2A } from './protocols/grpc/client'
+import { getSetting } from './utils/config'
 import { handleA2ATrigger } from "./protocols/a2a"
 /**
  * Built using https://github.com/microsoft/vscode-webview-ui-toolkit
@@ -78,21 +81,22 @@ export async function activate(context: vscode.ExtensionContext) {
 	
 	// Register command to reload window (dev only button)
 	context.subscriptions.push(
-    vscode.commands.registerCommand("kilo-scheduler.reloadWindowDev", async () => {
+    vscode.commands.registerCommand("agent-scheduler.reloadWindowDev", async () => {
 			await vscode.commands.executeCommand("workbench.action.reloadWindow")
 		})
 	)
 
 	// Register command to open the roo-cline extension (always register)
 	context.subscriptions.push(
-    vscode.commands.registerCommand("kilo-scheduler.openKiloCodeExtension", async () => {
-            await vscode.commands.executeCommand("kilo-code.SidebarProvider.focus")
+    vscode.commands.registerCommand("agent-scheduler.openAgentScheduler", async () => {
+            try { await vscode.commands.executeCommand("agent-scheduler.SidebarProvider.focus") } catch {}
+            try { await vscode.commands.executeCommand("kilo-code.SidebarProvider.focus") } catch {}
 		})
 	)
 
 	// Register command to handle schedule updates and notify the webview
 	context.subscriptions.push(
-		vscode.commands.registerCommand("kilo-scheduler.schedulesUpdated", async () => {
+		vscode.commands.registerCommand("agent-scheduler.schedulesUpdated", async () => {
 			// This command is called when schedules are updated
 			// Simply trigger a state refresh which will cause the webview to reload its data
 			console.log("Schedules updated sending message to webview")
@@ -114,17 +118,6 @@ export async function activate(context: vscode.ExtensionContext) {
 	)
 
 	// Experimental: A2A trigger command for cross-IDE integrations
-	context.subscriptions.push(
-		vscode.commands.registerCommand("kilo-scheduler.a2a.trigger", async (message?: any) => {
-			try {
-				return await handleA2ATrigger(message)
-			} catch (err) {
-				console.warn('A2A trigger failed', err)
-			}
-		}),
-	)
-
-	// Alias command for AgentScheduler namespace (prep for rename)
 	context.subscriptions.push(
 		vscode.commands.registerCommand("agent-scheduler.a2a.trigger", async (message?: any) => {
 			try {
@@ -154,7 +147,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	// Define badge updater now that provider exists
 	_updateActivityBadge = async () => {
 		try {
-			const enabled = vscode.workspace.getConfiguration('kilo-scheduler').get<boolean>('experimental.activityBadge') ?? false
+			const enabled = (getSetting<boolean>('experimental.activityBadge') ?? false)
 			const view = (provider as any).view
 			if (!view || typeof view !== 'object' || !('badge' in view)) {
 				return
@@ -177,7 +170,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	// React to configuration changes for the experimental badge
 	context.subscriptions.push(
 		vscode.workspace.onDidChangeConfiguration((e) => {
-			if (e.affectsConfiguration('kilo-scheduler.experimental.activityBadge') && _updateActivityBadge) {
+			if ((e.affectsConfiguration('agent-scheduler.experimental.activityBadge') || e.affectsConfiguration('kilo-scheduler.experimental.activityBadge')) && _updateActivityBadge) {
 				_updateActivityBadge()
 			}
 		}),
@@ -221,8 +214,26 @@ export async function activate(context: vscode.ExtensionContext) {
 
 
 	// Implements the `RooCodeAPI` interface.
-    const socketPath = process.env.KILO_IPC_SOCKET_PATH ?? process.env.ROO_CODE_IPC_SOCKET_PATH
+	const socketPath = process.env.KILO_IPC_SOCKET_PATH ?? process.env.ROO_CODE_IPC_SOCKET_PATH
 	const enableLogging = typeof socketPath === "string"
+
+	// Start experimental A2A gRPC server if enabled
+	try { await startA2AGrpcServer(context) } catch {}
+
+	// Optional: dev helper to invoke remote A2A via gRPC client
+	context.subscriptions.push(
+		vscode.commands.registerCommand('agent-scheduler.grpc.invoke', async () => {
+			const payload = await vscode.window.showInputBox({ prompt: 'A2A payload JSON (target.action + payload)', value: '{"target":{"agent":"kilocode"},"action":"trigger","payload":{"instructions":"Hello"}}' })
+			if (!payload) return
+			try {
+				const msg = JSON.parse(payload)
+				const res = await invokeA2A(context, msg)
+				vscode.window.showInformationMessage(`gRPC invoke result: ${JSON.stringify(res)}`)
+			} catch (e:any) {
+				vscode.window.showErrorMessage(`Invalid JSON or gRPC error: ${e?.message || e}`)
+			}
+		})
+	)
 }
 
 // This method is called when your extension is deactivated
