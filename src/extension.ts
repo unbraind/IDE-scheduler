@@ -22,6 +22,8 @@ import { CodeActionProvider } from "./core/CodeActionProvider"
 import { migrateSettings } from "./utils/migrateSettings"
 import { formatLanguage } from "./shared/language"
 import { ClineProvider } from "./core/webview/ClineProvider"
+import { SchedulerAdapterRegistry } from "./services/scheduler/adapters"
+import { handleA2ATrigger } from "./protocols/a2a"
 /**
  * Built using https://github.com/microsoft/vscode-webview-ui-toolkit
  *
@@ -37,6 +39,7 @@ let extensionContext: vscode.ExtensionContext
 // Your extension is activated the very first time the command is executed.
 export async function activate(context: vscode.ExtensionContext) {
 	extensionContext = context
+  ;(global as any).__extensionContext = context
     outputChannel = vscode.window.createOutputChannel("Kilo-Code")
 	context.subscriptions.push(outputChannel)
     outputChannel.appendLine("Kilo-Code extension activated")
@@ -52,6 +55,9 @@ export async function activate(context: vscode.ExtensionContext) {
 	// Initialize the scheduler service
 	const { SchedulerService } = await import('./services/scheduler/SchedulerService')
 	const schedulerService = SchedulerService.getInstance(context)
+
+	// Initialize experimental adapter registry (no-op if disabled)
+	try { await SchedulerAdapterRegistry.instance().initialize(context) } catch {}
 
 	// Hook to update an Activity Bar badge showing active schedules when enabled
 	let _updateActivityBadge: (() => Promise<void>) | null = null
@@ -104,6 +110,17 @@ export async function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.window.registerWebviewViewProvider(ClineProvider.sideBarId, provider, {
 			webviewOptions: { retainContextWhenHidden: true },
+		}),
+	)
+
+	// Experimental: A2A trigger command for cross-IDE integrations
+	context.subscriptions.push(
+		vscode.commands.registerCommand("kilo-scheduler.a2a.trigger", async (message?: any) => {
+			try {
+				await handleA2ATrigger(message)
+			} catch (err) {
+				console.warn('A2A trigger failed', err)
+			}
 		}),
 	)
 

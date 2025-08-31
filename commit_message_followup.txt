@@ -1,0 +1,31 @@
+feat(experimental): add cline/roo-code adapter stubs, strengthen A2A validation, and add tests
+
+Cross-IDE adapter scaffolding (WIP)
+- src/services/scheduler/adapters/ISchedulerAdapter.ts: defines adapter interface for schedule listing, active-state control, and agent triggering.
+- src/services/scheduler/adapters/KiloCodeAdapter.ts: concrete adapter for Kilo Code; best-effort trigger via commands.
+- NEW src/services/scheduler/adapters/ClineAdapter.ts: stub (no-op) adapter for Cline with TODO notes.
+- NEW src/services/scheduler/adapters/RooCodeAdapter.ts: stub (no-op) adapter for Roo Code with TODO notes.
+- src/services/scheduler/adapters/index.ts: registry now conditionally registers experimental adapters when `kilo-scheduler.experimental.crossIde` is true; always registers Kilo Code.
+
+A2A protocol hardening
+- src/protocols/a2a.ts: add `validateA2AMessage()` to rigorously validate protocol, version, target.agent, action, and payload shape. `handleA2ATrigger()` now validates, logs warnings on errors, and routes to the adapter registry. Still fully guarded by `kilo-scheduler.experimental.crossIde`.
+- src/extension.ts: expose `__extensionContext` on global early (for adapter init paths) and register A2A command (previous commit).
+
+Tests
+- NEW src/__tests__/protocols/a2a.test.ts:
+  - Validates message shape (positive/negative cases).
+  - Verifies disabled cross-IDE setting short-circuits with info message.
+  - Verifies enabled path routes to Kilo Code adapter (executeCommand invoked).
+  - Verifies invalid messages do not trigger any commands.
+
+Webview
+- No functional UI changes. Prior App tests remain green; we added only adapter stubs and protocol tests.
+
+Results
+- Extension tests: 241/241 passing.
+- Webview tests: 57/57 passing.
+- VSIX rebuilt successfully (bin/kilo-scheduler-0.0.14.vsix).
+
+Notes
+- cline/roo-code adapters are intentionally no-ops to wire the surface and keep existing behavior stable. Future work can flesh out schedule sync and agent launch semantics.
+- All experimental features remain behind settings and do not alter current Kilo Code flows.

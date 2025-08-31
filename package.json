@@ -63,6 +63,12 @@
 					"type": "boolean",
 					"default": false,
 					"description": "Experimental: show the number of active schedules as a badge on the Kilo Scheduler Activity Bar icon."
+				,
+				"kilo-scheduler.experimental.crossIde": {
+					"type": "boolean",
+					"default": false,
+					"description": "Experimental (WIP): Enable cross-IDE scheduling interface + Agent-to-Agent trigger support. Very early WIP (cline, roo-code, Continue, Cursor, Claude Code, Gemini CLI, Qwen Coder CLI)."
+				}
 				}
 			}
 		},
@@ -101,6 +107,11 @@
 					"light": "assets/icons/scheduler-icon-light.png",
 					"dark": "assets/icons/scheduler-icon-dark.png"
 				}
+			},
+			{
+				"command": "kilo-scheduler.a2a.trigger",
+				"title": "A2A: Trigger Agent (Experimental)",
+				"category": "Kilo Scheduler"
 			}
 		],
 		"menus": {

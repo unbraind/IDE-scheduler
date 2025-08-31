@@ -28,6 +28,10 @@
 - Experimental setting to show active schedules count as an Activity Bar badge:
   - Setting key: `kilo-scheduler.experimental.activityBadge`
   - When enabled, the Kilo Scheduler icon in the Activity Bar shows the number of active schedules; hidden when zero.
+- Experimental cross-IDE scheduler interface (WIP):
+  - Setting key: `kilo-scheduler.experimental.crossIde`
+  - Scaffolds a minimal adapter registry with a `Kilo Code` adapter to stabilize future integrations (cline, roo-code, Continue, Cursor, Claude Code, Gemini CLI, Qwen Coder CLI).
+  - Adds command `kilo-scheduler.a2a.trigger` that accepts a minimal Agent-to-Agent (A2A) payload and best-effort triggers the Kilo Code agent.
 
 ### Changed
 - Bumped extension version to `0.0.14`.

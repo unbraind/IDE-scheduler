@@ -12,61 +12,7 @@ jest.mock("../utils/vscode", () => ({
 	},
 }))
 
-jest.mock("../components/chat/ChatView", () => ({
-	__esModule: true,
-	default: function ChatView({ isHidden }: { isHidden: boolean }) {
-		return (
-			<div data-testid="chat-view" data-hidden={isHidden}>
-				Chat View
-			</div>
-		)
-	},
-}))
-
-jest.mock("../components/settings/SettingsView", () => ({
-	__esModule: true,
-	default: function SettingsView({ onDone }: { onDone: () => void }) {
-		return (
-			<div data-testid="settings-view" onClick={onDone}>
-				Settings View
-			</div>
-		)
-	},
-}))
-
-jest.mock("../components/history/HistoryView", () => ({
-	__esModule: true,
-	default: function HistoryView({ onDone }: { onDone: () => void }) {
-		return (
-			<div data-testid="history-view" onClick={onDone}>
-				History View
-			</div>
-		)
-	},
-}))
-
-jest.mock("../components/mcp/McpView", () => ({
-	__esModule: true,
-	default: function McpView({ onDone }: { onDone: () => void }) {
-		return (
-			<div data-testid="mcp-view" onClick={onDone}>
-				MCP View
-			</div>
-		)
-	},
-}))
-
-jest.mock("../components/prompts/PromptsView", () => ({
-	__esModule: true,
-	default: function PromptsView({ onDone }: { onDone: () => void }) {
-		return (
-			<div data-testid="prompts-view" onClick={onDone}>
-				Prompts View
-			</div>
-		)
-	},
-}))
-
+// Mock extension state to render immediately
 jest.mock("../context/ExtensionStateContext", () => ({
 	useExtensionState: () => ({
 		didHydrateState: true,
@@ -97,103 +43,51 @@ describe("App", () => {
 		window.dispatchEvent(messageEvent)
 	}
 
-	it("shows chat view by default", () => {
-		render(<AppWithProviders />)
+  it("shows Scheduler view by default", () => {
+    render(<AppWithProviders />)
+    expect(screen.getByText(/Scheduler/i)).toBeInTheDocument()
+    expect(screen.getByText(/Create New Schedule/i)).toBeInTheDocument()
+  })
 
-		const chatView = screen.getByTestId("chat-view")
-		expect(chatView).toBeInTheDocument()
-		expect(chatView.getAttribute("data-hidden")).toBe("false")
-	})
+  it("handles settingsButtonClicked action without leaving Scheduler view", async () => {
+    render(<AppWithProviders />)
+    act(() => { triggerMessage("settingsButtonClicked") })
+    expect(screen.queryByTestId("settings-view")).not.toBeInTheDocument()
+    expect(screen.getByText(/Scheduler/i)).toBeInTheDocument()
+  })
 
-	it("switches to settings view when receiving settingsButtonClicked action", async () => {
-		render(<AppWithProviders />)
+  it("handles historyButtonClicked action without leaving Scheduler view", async () => {
+    render(<AppWithProviders />)
+    act(() => { triggerMessage("historyButtonClicked") })
+    expect(screen.queryByTestId("history-view")).not.toBeInTheDocument()
+    expect(screen.getByText(/Scheduler/i)).toBeInTheDocument()
+  })
 
-		act(() => {
-			triggerMessage("settingsButtonClicked")
-		})
+  it("handles mcpButtonClicked action without leaving Scheduler view", async () => {
+    render(<AppWithProviders />)
+    act(() => { triggerMessage("mcpButtonClicked") })
+    expect(screen.queryByTestId("mcp-view")).not.toBeInTheDocument()
+    expect(screen.getByText(/Scheduler/i)).toBeInTheDocument()
+  })
 
-		const settingsView = await screen.findByTestId("settings-view")
-		expect(settingsView).toBeInTheDocument()
+  it("handles promptsButtonClicked action without leaving Scheduler view", async () => {
+    render(<AppWithProviders />)
+    act(() => { triggerMessage("promptsButtonClicked") })
+    expect(screen.queryByTestId("prompts-view")).not.toBeInTheDocument()
+    expect(screen.getByText(/Scheduler/i)).toBeInTheDocument()
+  })
 
-		const chatView = screen.getByTestId("chat-view")
-		expect(chatView.getAttribute("data-hidden")).toBe("true")
-	})
+  it("ignores done click targets and keeps Scheduler view", async () => {
+    render(<AppWithProviders />)
+    act(() => { triggerMessage("settingsButtonClicked") })
+    expect(screen.queryByTestId("settings-view")).not.toBeInTheDocument()
+    expect(screen.getByText(/Scheduler/i)).toBeInTheDocument()
+  })
 
-	it("switches to history view when receiving historyButtonClicked action", async () => {
-		render(<AppWithProviders />)
-
-		act(() => {
-			triggerMessage("historyButtonClicked")
-		})
-
-		const historyView = await screen.findByTestId("history-view")
-		expect(historyView).toBeInTheDocument()
-
-		const chatView = screen.getByTestId("chat-view")
-		expect(chatView.getAttribute("data-hidden")).toBe("true")
-	})
-
-	it("switches to MCP view when receiving mcpButtonClicked action", async () => {
-		render(<AppWithProviders />)
-
-		act(() => {
-			triggerMessage("mcpButtonClicked")
-		})
-
-		const mcpView = await screen.findByTestId("mcp-view")
-		expect(mcpView).toBeInTheDocument()
-
-		const chatView = screen.getByTestId("chat-view")
-		expect(chatView.getAttribute("data-hidden")).toBe("true")
-	})
-
-	it("switches to prompts view when receiving promptsButtonClicked action", async () => {
-		render(<AppWithProviders />)
-
-		act(() => {
-			triggerMessage("promptsButtonClicked")
-		})
-
-		const promptsView = await screen.findByTestId("prompts-view")
-		expect(promptsView).toBeInTheDocument()
-
-		const chatView = screen.getByTestId("chat-view")
-		expect(chatView.getAttribute("data-hidden")).toBe("true")
-	})
-
-	it("returns to chat view when clicking done in settings view", async () => {
-		render(<AppWithProviders />)
-
-		act(() => {
-			triggerMessage("settingsButtonClicked")
-		})
-
-		const settingsView = await screen.findByTestId("settings-view")
-
-		act(() => {
-			settingsView.click()
-		})
-
-		const chatView = screen.getByTestId("chat-view")
-		expect(chatView.getAttribute("data-hidden")).toBe("false")
-		expect(screen.queryByTestId("settings-view")).not.toBeInTheDocument()
-	})
-
-	it.each(["history", "mcp", "prompts"])("returns to chat view when clicking done in %s view", async (view) => {
-		render(<AppWithProviders />)
-
-		act(() => {
-			triggerMessage(`${view}ButtonClicked`)
-		})
-
-		const viewElement = await screen.findByTestId(`${view}-view`)
-
-		act(() => {
-			viewElement.click()
-		})
-
-		const chatView = screen.getByTestId("chat-view")
-		expect(chatView.getAttribute("data-hidden")).toBe("false")
-		expect(screen.queryByTestId(`${view}-view`)).not.toBeInTheDocument()
-	})
+  it.each(["history", "mcp", "prompts"])('does not navigate to %s view in Scheduler UI', async (view) => {
+    render(<AppWithProviders />)
+    act(() => { triggerMessage(`${view}ButtonClicked`) })
+    expect(screen.getByText(/Scheduler/i)).toBeInTheDocument()
+    expect(screen.queryByTestId(`${view}-view`)).not.toBeInTheDocument()
+  })
 })
