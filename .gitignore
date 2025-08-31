@@ -47,3 +47,6 @@ PROJECT.md
 .qoder/quests/unknown-task.md
 .qoder/quests/modes-synchronization.md
 .roo/schedules.json
+
+.kilo/
+*.vsix
