@@ -29,6 +29,7 @@ import { invokeA2A } from './protocols/grpc/client'
 import { getSetting } from './utils/config'
 import { handleA2ATrigger } from "./protocols/a2a"
 import { startMcpA2AEndpoint, stopMcpA2AEndpoint } from './integrations/mcp/server'
+import { startA2AHttpServer, stopA2AHttpServer, buildAgentCard } from './protocols/http/server'
 /**
  * Built using https://github.com/microsoft/vscode-webview-ui-toolkit
  *
@@ -253,14 +254,17 @@ export async function activate(context: vscode.ExtensionContext) {
 	const socketPath = process.env.KILO_IPC_SOCKET_PATH ?? process.env.ROO_CODE_IPC_SOCKET_PATH
 	const enableLogging = typeof socketPath === "string"
 
-	// Start experimental A2A gRPC server if enabled
-	try { await startA2AGrpcServer(context) } catch {}
+    // Start experimental A2A gRPC server if enabled
+    try { await startA2AGrpcServer(context) } catch {}
 
-	// Start MCP HTTP endpoint if enabled (experimental)
-	try { await startMcpA2AEndpoint(context) } catch {}
+    // Start MCP HTTP endpoint if enabled (experimental)
+    try { await startMcpA2AEndpoint(context) } catch {}
 
-	// Optional: dev helper to invoke remote A2A via gRPC client
-	context.subscriptions.push(
+    // Start A2A HTTP endpoint if enabled (experimental)
+    try { await startA2AHttpServer(context) } catch {}
+
+    // Optional: dev helper to invoke remote A2A via gRPC client
+    context.subscriptions.push(
 		vscode.commands.registerCommand('agent-scheduler.grpc.invoke', async () => {
 			const payload = await vscode.window.showInputBox({ prompt: 'A2A payload JSON (target.action + payload)', value: '{"target":{"agent":"kilocode"},"action":"trigger","payload":{"instructions":"Hello"}}' })
 			if (!payload) return
@@ -272,14 +276,30 @@ export async function activate(context: vscode.ExtensionContext) {
 				vscode.window.showErrorMessage(`Invalid JSON or gRPC error: ${e?.message || e}`)
 			}
 		})
-	)
+    )
+
+    // Command to export Agent Card (discovery doc)
+    context.subscriptions.push(
+        vscode.commands.registerCommand('agent-scheduler.exportAgentCard', async () => {
+            try {
+                const card = buildAgentCard()
+                const ws = getWorkspacePath()
+                const dest = path.join(ws || (__dirname), 'agent-card.json')
+                await fs.writeFile(dest, JSON.stringify(card, null, 2), 'utf8')
+                vscode.window.showInformationMessage(`Agent Card written to ${dest}`)
+            } catch (e:any) {
+                vscode.window.showErrorMessage(`Failed to write Agent Card: ${e?.message || e}`)
+            }
+        })
+    )
 }
 
 // This method is called when your extension is deactivated
 export async function deactivate() {
     outputChannel.appendLine("Kilo-Code extension deactivated")
-	// Clean up MCP server manager
-	try { stopMcpA2AEndpoint() } catch {}
+    // Clean up MCP server manager
+    try { stopMcpA2AEndpoint() } catch {}
+    try { stopA2AHttpServer() } catch {}
 	// The scheduler service will be automatically cleaned up when the extension is deactivated
 	// as its timers are registered as disposables in the extension context
 }

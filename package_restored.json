@@ -1,9 +1,9 @@
 {
-	"name": "agent-scheduler",
-	"displayName": "Agent Scheduler",
+	"name": "kilo-scheduler",
+	"displayName": "Kilo Scheduler",
 	"description": "A task scheduler for Kilo Code",
 	"publisher": "unbrained",
-	"version": "0.0.17",
+	"version": "0.0.16",
 	"icon": "assets/icons/scheduler-icon-light.png",
 	"galleryBanner": {
 		"color": "#617A91",
@@ -300,33 +300,23 @@
 						"default": true,
 						"description": "Enable Kilo Code adapter (experimental cross-IDE)."
 					},
-				"agent-scheduler.experimental.agents.kilocode.allowedActions": {
-					"type": "array",
-					"description": "Allowed A2A actions for Kilo Code adapter.",
-					"items": {
-						"type": "string",
-						"enum": [
+					"agent-scheduler.experimental.agents.kilocode.allowedActions": {
+						"type": "array",
+						"description": "Allowed A2A actions for Kilo Code adapter.",
+						"items": {
+							"type": "string",
+							"enum": [
+								"trigger",
+								"list",
+								"setActive"
+							]
+						},
+						"default": [
 							"trigger",
 							"list",
-							"setActive",
-							"message",
-							"task.create",
-							"task.get",
-							"task.list",
-							"task.cancel"
+							"setActive"
 						]
 					},
-					"default": [
-						"trigger",
-						"list",
-						"setActive",
-						"message",
-						"task.create",
-						"task.get",
-						"task.list",
-						"task.cancel"
-					]
-				},
 					"agent-scheduler.experimental.agents.cline.enabled": {
 						"type": "boolean",
 						"default": false,
@@ -692,5 +682,3 @@
 		]
 	}
 }
-
-

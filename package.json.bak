@@ -240,7 +240,7 @@
 						"default": false,
 						"description": "Experimental (WIP): Enable cross-IDE scheduling interface + Agent-to-Agent trigger support."
 					},
-					"agent-scheduler.experimental.mcp.enabled": {
+				"agent-scheduler.experimental.mcp.enabled": {
 						"type": "boolean",
 						"default": false,
 						"description": "Enable MCP integration for forwarding/receiving A2A messages (experimental)."
@@ -290,7 +290,7 @@
 						"default": false,
 						"description": "Enable A2A gRPC client for outbound messages."
 					},
-					"agent-scheduler.experimental.grpc.client.target": {
+				"agent-scheduler.experimental.grpc.client.target": {
 						"type": "string",
 						"default": "127.0.0.1:50251",
 						"description": "Target host:port of remote A2A gRPC server."
@@ -337,15 +337,9 @@
 						"description": "Allowed A2A actions for Cline adapter.",
 						"items": {
 							"type": "string",
-							"enum": [
-								"trigger",
-								"list",
-								"setActive"
-							]
+							"enum": ["trigger","list","setActive","message","task.create","task.get","task.list","task.cancel"]
 						},
-						"default": [
-							"trigger"
-						]
+						"default": ["trigger"]
 					},
 					"agent-scheduler.experimental.agents.cline.triggerCommand": {
 						"type": "string",
@@ -372,6 +366,11 @@
 						"default": "",
 						"description": "Override command id to trigger Continue."
 					},
+					"agent-scheduler.experimental.agents.continue.allowedActions": {
+						"type": "array",
+						"items": { "type": "string", "enum": ["trigger","list","setActive","message","task.create","task.get","task.list","task.cancel"] },
+						"default": ["trigger"]
+					},
 					"agent-scheduler.experimental.agents.continue.listCommand": {
 						"type": "string",
 						"default": "",
@@ -381,6 +380,11 @@
 						"type": "string",
 						"default": "",
 						"description": "Override command id to trigger Cursor."
+					},
+					"agent-scheduler.experimental.agents.cursor.allowedActions": {
+						"type": "array",
+						"items": { "type": "string", "enum": ["trigger","list","setActive","message","task.create","task.get","task.list","task.cancel"] },
+						"default": ["trigger"]
 					},
 					"agent-scheduler.experimental.agents.cursor.listCommand": {
 						"type": "string",
@@ -392,6 +396,11 @@
 						"default": "",
 						"description": "Override command id to trigger Claude Code."
 					},
+					"agent-scheduler.experimental.agents.claudeCode.allowedActions": {
+						"type": "array",
+						"items": { "type": "string", "enum": ["trigger","list","setActive","message","task.create","task.get","task.list","task.cancel"] },
+						"default": ["trigger"]
+					},
 					"agent-scheduler.experimental.agents.claudeCode.listCommand": {
 						"type": "string",
 						"default": "",
@@ -402,6 +411,11 @@
 						"default": "",
 						"description": "Override command id to trigger Google Gemini CLI."
 					},
+					"agent-scheduler.experimental.agents.geminiCli.allowedActions": {
+						"type": "array",
+						"items": { "type": "string", "enum": ["trigger","list","setActive","message","task.create","task.get","task.list","task.cancel"] },
+						"default": ["trigger"]
+					},
 					"agent-scheduler.experimental.agents.geminiCli.listCommand": {
 						"type": "string",
 						"default": "",
@@ -411,6 +425,11 @@
 						"type": "string",
 						"default": "",
 						"description": "Override command id to trigger Qwen Coder CLI."
+					},
+					"agent-scheduler.experimental.agents.qwenCli.allowedActions": {
+						"type": "array",
+						"items": { "type": "string", "enum": ["trigger","list","setActive","message","task.create","task.get","task.list","task.cancel"] },
+						"default": ["trigger"]
 					},
 					"agent-scheduler.experimental.agents.qwenCli.listCommand": {
 						"type": "string",
@@ -515,6 +534,11 @@
 			{
 				"command": "agent-scheduler.grpc.invoke",
 				"title": "AgentScheduler: gRPC A2A Invoke (Experimental)",
+				"category": "Agent Scheduler"
+			},
+			{
+				"command": "agent-scheduler.exportAgentCard",
+				"title": "AgentScheduler: Export Agent Card (Discovery)",
 				"category": "Agent Scheduler"
 			},
 			{
@@ -688,6 +712,26 @@
 			"npx eslint -c .eslintrc.json --max-warnings=0 --fix"
 		],
 		"webview-ui/**/*.{ts,tsx}": [
+				"agent-scheduler.experimental.http.enabled": {
+					"type": "boolean",
+					"default": false,
+					"description": "Enable A2A HTTP endpoint (JSON) for broader interoperability."
+				},
+				"agent-scheduler.experimental.http.host": {
+					"type": "string",
+					"default": "127.0.0.1",
+					"description": "Host/interface for A2A HTTP server."
+				},
+				"agent-scheduler.experimental.http.port": {
+					"type": "number",
+					"default": 50252,
+					"description": "Port for A2A HTTP server."
+				},
+				"agent-scheduler.experimental.http.basePath": {
+					"type": "string",
+					"default": "/a2a",
+					"description": "Base path for A2A HTTP routes (/.well-known/agent-card, /invoke, /sendMessage, /tasks/*)."
+				},
 			"npx eslint -c webview-ui/.eslintrc.json --max-warnings=0 --fix"
 		]
 	}
