@@ -1,15 +1,13 @@
 <div align="center">
-  <img src="https://kylehoskinswebsite.s3.us-east-2.amazonaws.com/RooSchedulerPreview.png?v=2" alt="Kilo Scheduler Icon" width="600" />
+  <img src="https://kylehoskinswebsite.s3.us-east-2.amazonaws.com/RooSchedulerPreview.png?v=2" alt="Agent Scheduler Icon" width="600" />
 </div>
 
 <div align="center">
-<h1>Kilo Scheduler</h1>
-
-<a href="https://marketplace.visualstudio.com/items?itemName=KyleHoskins.roo-scheduler" target="_blank"><img src="https://img.shields.io/badge/Download%20on%20VS%20Marketplace-blue?style=for-the-badge&logo=visualstudiocode&logoColor=white" alt="Download on VS Marketplace"></a>
+<h1>Agent Scheduler (formerly Kilo Scheduler)</h1>
 
 </div>
 
-**Kilo Scheduler** is a task scheduling extension for VS Code that seamlessly integrates with [Kilo Code](https://github.com/Kilo-Org/kilocode). It allows you to automate recurring tasks and workflows directly within your development environment.
+Agent Scheduler brings cross‑IDE Agent‑to‑Agent (A2A) orchestration into VS Code with multiple transports (gRPC, HTTP JSON, MCP), pluggable adapters (Kilo Code, Cline, Roo Code, Continue, Cursor, Claude Code, …), and a secure access‑key model. It also includes the original robust task‑scheduling features.
 
 Important: This project is a fork of [kyle-apex/roo-scheduler](https://github.com/kyle-apex/roo-scheduler). All credit for the original Scheduler concept and implementation belongs to that project. This fork adapts the extension to work natively with Kilo Code (IDs, APIs, config, assets) and maintains feature parity where possible.
 
@@ -28,6 +26,19 @@ Important: This project is a fork of [kyle-apex/roo-scheduler](https://github.co
 - **Interrupt Mode**: Automatically interrupt any running task to execute the scheduled task
 - **Skip Mode**: Skip execution if another task is already running
 
+### Transports & Interop
+
+- gRPC A2A: a2a.v1.A2AService with Invoke, SendMessage, CreateTask, GetTask, ListTasks, CancelTask (see `src/protocols/grpc/a2a.proto`).
+- HTTP A2A: JSON endpoints at basePath (default `/a2a`): `/.well-known/agent-card`, `/invoke`, `/sendMessage`, `/tasks/*`.
+- MCP: HTTP Stream transport exposing tool `a2a.invoke` using `@modelcontextprotocol/sdk`.
+
+### Security: Access Keys
+
+- Keys are generated once (random), hashed (SHA‑256), and stored in SecretStorage.
+- Scope by transports (http/grpc/mcp) and actions (e.g., message, task.create, … or `*`).
+- Require keys per transport with settings: `agent-scheduler.experimental.auth.http.required`, `.grpc.required`, `.mcp.required`.
+- Commands to manage keys: Create/List/Revoke/Toggle.
+
 ### Seamless [Kilo Code](https://github.com/Kilo-Org/kilocode) Integration
 
 Kilo Scheduler connects with [Kilo Code](https://github.com/Kilo-Org/kilocode)'s extension points which allow it to:
@@ -43,6 +54,23 @@ Kilo Scheduler connects with [Kilo Code](https://github.com/Kilo-Org/kilocode)'s
 - **Dependency Checks**: Regularly verify and update project dependencies
 - **Codebase Analysis**: Run periodic analysis to identify optimization opportunities
 - **Custom Workflows**: Automate any repetitive development task with natural language instructions (tests, memory bank, MCP etc)
+
+## Settings Overview
+
+- Transports:
+  - `agent-scheduler.experimental.grpc.enabled|host|port`
+  - `agent-scheduler.experimental.http.enabled|host|port|basePath`
+  - `agent-scheduler.experimental.mcp.enabled`; `agent-scheduler.experimental.mcp.http.enabled|port|path`
+- Security:
+  - `agent-scheduler.experimental.auth.http.required|grpc.required|mcp.required`
+  - Keys managed via commands (`AgentScheduler: Create/List/Revoke/Toggle Access Key`)
+- Discovery / mapping:
+  - `agent-scheduler.experimental.crossIde` (enable adapter registry)
+  - `agent-scheduler.experimental.autoMapOnStartup` (discover & persist trigger/list commands)
+- Per‑agent config:
+  - `agent-scheduler.experimental.agents.<agent>.enabled`
+  - `agent-scheduler.experimental.agents.<agent>.allowedActions`
+  - `agent-scheduler.experimental.agents.<agent>.triggerCommand|listCommand`
 
 ## Usage Tips
 

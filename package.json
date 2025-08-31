@@ -3,7 +3,7 @@
 	"displayName": "Agent Scheduler",
 	"description": "A task scheduler for Kilo Code",
 	"publisher": "unbrained",
-	"version": "0.0.17",
+	"version": "0.0.18",
 	"icon": "assets/icons/scheduler-icon-light.png",
 	"galleryBanner": {
 		"color": "#617A91",

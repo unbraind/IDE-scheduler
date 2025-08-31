@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.0.18] - 2025-08-31
+
+### Added
+- A2A HTTP auth enforcement + key management commands; adapter auto‑mapping on startup; expanded README with transports, security, and settings overview.
+
+### Changed
+- Workspace settings now enable HTTP/MCP and cross‑IDE for easier testing; icon guidance documented in README.
+
+### Tests
+- Existing test suites remain green; additional endpoint auth tests can be added next for HTTP/gRPC parity.
+
 ## [0.0.17] - 2025-08-31
 
 ### Added
@@ -18,6 +29,16 @@
 - Tests:
   - `src/__tests__/protocols/a2a_rpcs.test.ts` validates handler routing for new RPCs.
   - `src/__tests__/mcp_endpoint.test.ts` mocks MCP HTTP transport and calls `a2a.invoke` end-to-end.
+- Access key auth (experimental but production-ready design):
+  - New SecretStorage-backed key management with hashed tokens and scoped permissions.
+  - Commands: `agent-scheduler.auth.createKey`, `.listKeys`, `.revokeKey`, `.toggleKey`.
+  - Settings toggles to require auth per transport: `agent-scheduler.experimental.auth.http.required`, `.grpc.required`, `.mcp.required`.
+  - HTTP/gRPC/MCP endpoints enforce `Authorization: Bearer <key>` or `x-agent-key` when required.
+- A2A HTTP endpoint + Agent Card:
+  - Settings: `agent-scheduler.experimental.http.enabled|host|port|basePath`.
+  - Routes: `/.well-known/agent-card`, `/invoke`, `/sendMessage`, `/tasks/*`.
+  - Export command: `agent-scheduler.exportAgentCard` writes `agent-card.json`.
+  - Workspace: enabled HTTP/MCP and auto-map defaults in `.vscode/settings.json` for quick testing.
 
 ### Changed
 - Bumped version to `0.0.17`.
