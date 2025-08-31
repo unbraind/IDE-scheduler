@@ -235,11 +235,16 @@
 						"default": false,
 						"description": "Experimental: show the number of active schedules as a badge on the Agent Scheduler Activity Bar icon."
 					},
-					"agent-scheduler.experimental.crossIde": {
-						"type": "boolean",
-						"default": false,
-						"description": "Experimental (WIP): Enable cross-IDE scheduling interface + Agent-to-Agent trigger support."
-					},
+				"agent-scheduler.experimental.crossIde": {
+					"type": "boolean",
+					"default": false,
+					"description": "Experimental (WIP): Enable cross-IDE scheduling interface + Agent-to-Agent trigger support."
+				},
+				"agent-scheduler.experimental.autoMapOnStartup": {
+					"type": "boolean",
+					"default": true,
+					"description": "On activation, discover installed agent extensions and prefill trigger/list commands when missing."
+				},
 					"agent-scheduler.experimental.mcp.enabled": {
 						"type": "boolean",
 						"default": false,
@@ -268,8 +273,23 @@
 					"agent-scheduler.experimental.mcp.http.path": {
 						"type": "string",
 						"default": "/mcp",
-						"description": "Base path for the MCP HTTP endpoint."
-					},
+					"description": "Base path for the MCP HTTP endpoint."
+				},
+				"agent-scheduler.experimental.auth.http.required": {
+					"type": "boolean",
+					"default": false,
+					"description": "Require an access key for HTTP A2A endpoints. Manage keys via commands: Create/List/Revoke/Toggle Access Key."
+				},
+				"agent-scheduler.experimental.auth.grpc.required": {
+					"type": "boolean",
+					"default": false,
+					"description": "Require an access key for gRPC A2A endpoints. Clients must send 'authorization: Bearer <key>' or 'x-agent-key' metadata."
+				},
+				"agent-scheduler.experimental.auth.mcp.required": {
+					"type": "boolean",
+					"default": false,
+					"description": "Require an access key for MCP HTTP endpoint. Clients must include 'Authorization: Bearer <key>' or 'x-agent-key' header."
+				},
 					"agent-scheduler.experimental.grpc.enabled": {
 						"type": "boolean",
 						"default": false,
@@ -518,8 +538,33 @@
 				"category": "Agent Scheduler"
 			},
 			{
+				"command": "agent-scheduler.exportAgentCard",
+				"title": "AgentScheduler: Export Agent Card (Discovery)",
+				"category": "Agent Scheduler"
+			},
+			{
 				"command": "agent-scheduler.mapAgentCommands",
 				"title": "AgentScheduler: Map Agent Commands (Discover & Persist)",
+				"category": "Agent Scheduler"
+			},
+			{
+				"command": "agent-scheduler.auth.createKey",
+				"title": "AgentScheduler: Create Access Key",
+				"category": "Agent Scheduler"
+			},
+			{
+				"command": "agent-scheduler.auth.listKeys",
+				"title": "AgentScheduler: List Access Keys",
+				"category": "Agent Scheduler"
+			},
+			{
+				"command": "agent-scheduler.auth.revokeKey",
+				"title": "AgentScheduler: Revoke Access Key",
+				"category": "Agent Scheduler"
+			},
+			{
+				"command": "agent-scheduler.auth.toggleKey",
+				"title": "AgentScheduler: Toggle Access Key Enabled",
 				"category": "Agent Scheduler"
 			}
 		],
@@ -692,5 +737,6 @@
 		]
 	}
 }
+
 
 

@@ -2,6 +2,7 @@ import * as http from 'http'
 import * as vscode from 'vscode'
 import { getSetting } from '../../utils/config'
 import { handleA2ATrigger, handleSendMessage, handleCreateTask, handleGetTask, handleListTasks, handleCancelTask } from '../a2a'
+import { authorize } from '../../security/auth'
 
 let httpServer: http.Server | null = null
 
@@ -27,30 +28,42 @@ export async function startA2AHttpServer(_context: vscode.ExtensionContext) {
             return send(buildAgentCard())
           }
           if (req.method === 'POST' && req.url === `${base}/invoke`) {
+            const authz = await authorize((global as any).__extensionContext, 'http', String(body?.action || 'invoke'), req.headers['authorization'] as string || (req.headers['x-agent-key'] as string))
+            if (!authz.ok) return send({ ok: false, error: authz.error || 'unauthorized' }, 401)
             const result = await handleA2ATrigger(body)
             return send(result)
           }
           if (req.method === 'POST' && req.url === `${base}/sendMessage`) {
+            const authz = await authorize((global as any).__extensionContext, 'http', 'message', req.headers['authorization'] as string || (req.headers['x-agent-key'] as string))
+            if (!authz.ok) return send({ ok: false, error: authz.error || 'unauthorized' }, 401)
             const { target, channel, text, metadata } = body || {}
             const result = await handleSendMessage({ agent: String(target?.agent || ''), channel, text, metadata })
             return send(result)
           }
           if (req.method === 'POST' && req.url === `${base}/tasks/create`) {
+            const authz = await authorize((global as any).__extensionContext, 'http', 'task.create', req.headers['authorization'] as string || (req.headers['x-agent-key'] as string))
+            if (!authz.ok) return send({ ok: false, error: authz.error || 'unauthorized' }, 401)
             const { target, title, params } = body || {}
             const result = await handleCreateTask({ agent: String(target?.agent || ''), title, params })
             return send(result)
           }
           if (req.method === 'POST' && req.url === `${base}/tasks/get`) {
+            const authz = await authorize((global as any).__extensionContext, 'http', 'task.get', req.headers['authorization'] as string || (req.headers['x-agent-key'] as string))
+            if (!authz.ok) return send({ ok: false, error: authz.error || 'unauthorized' }, 401)
             const { target, id } = body || {}
             const result = await handleGetTask({ agent: String(target?.agent || ''), id: String(id || '') })
             return send(result)
           }
           if (req.method === 'POST' && req.url === `${base}/tasks/list`) {
+            const authz = await authorize((global as any).__extensionContext, 'http', 'task.list', req.headers['authorization'] as string || (req.headers['x-agent-key'] as string))
+            if (!authz.ok) return send({ ok: false, error: authz.error || 'unauthorized' }, 401)
             const { target, filter, options } = body || {}
             const result = await handleListTasks({ agent: String(target?.agent || ''), filter, options })
             return send(result)
           }
           if (req.method === 'POST' && req.url === `${base}/tasks/cancel`) {
+            const authz = await authorize((global as any).__extensionContext, 'http', 'task.cancel', req.headers['authorization'] as string || (req.headers['x-agent-key'] as string))
+            if (!authz.ok) return send({ ok: false, error: authz.error || 'unauthorized' }, 401)
             const { target, id } = body || {}
             const result = await handleCancelTask({ agent: String(target?.agent || ''), id: String(id || '') })
             return send(result)

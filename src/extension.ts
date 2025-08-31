@@ -30,6 +30,7 @@ import { getSetting } from './utils/config'
 import { handleA2ATrigger } from "./protocols/a2a"
 import { startMcpA2AEndpoint, stopMcpA2AEndpoint } from './integrations/mcp/server'
 import { startA2AHttpServer, stopA2AHttpServer, buildAgentCard } from './protocols/http/server'
+import { createKey, listKeys, revokeKey, setKeyEnabled } from './security/auth'
 /**
  * Built using https://github.com/microsoft/vscode-webview-ui-toolkit
  *
@@ -62,8 +63,17 @@ export async function activate(context: vscode.ExtensionContext) {
 	const { SchedulerService } = await import('./services/scheduler/SchedulerService')
 	const schedulerService = SchedulerService.getInstance(context)
 
-	// Initialize experimental adapter registry (no-op if disabled)
-	try { await SchedulerAdapterRegistry.instance().initialize(context) } catch {}
+  // Initialize experimental adapter registry (no-op if disabled)
+  try { await SchedulerAdapterRegistry.instance().initialize(context) } catch {}
+  // Optional auto-map on startup to prefill trigger/list
+  try {
+    const crossIde = (getSetting<boolean>('experimental.crossIde') ?? false)
+    const autoMap = (getSetting<boolean>('experimental.autoMapOnStartup') ?? true)
+    if (crossIde && autoMap) {
+      const discovered = await discoverAgentCommands()
+      await persistDiscoveredAgentCommands(discovered)
+    }
+  } catch {}
 
 	// Hook to update an Activity Bar badge showing active schedules when enabled
 	let _updateActivityBadge: (() => Promise<void>) | null = null
@@ -263,7 +273,7 @@ export async function activate(context: vscode.ExtensionContext) {
     // Start A2A HTTP endpoint if enabled (experimental)
     try { await startA2AHttpServer(context) } catch {}
 
-    // Optional: dev helper to invoke remote A2A via gRPC client
+	// Optional: dev helper to invoke remote A2A via gRPC client
     context.subscriptions.push(
 		vscode.commands.registerCommand('agent-scheduler.grpc.invoke', async () => {
 			const payload = await vscode.window.showInputBox({ prompt: 'A2A payload JSON (target.action + payload)', value: '{"target":{"agent":"kilocode"},"action":"trigger","payload":{"instructions":"Hello"}}' })
@@ -276,9 +286,9 @@ export async function activate(context: vscode.ExtensionContext) {
 				vscode.window.showErrorMessage(`Invalid JSON or gRPC error: ${e?.message || e}`)
 			}
 		})
-    )
+	)
 
-    // Command to export Agent Card (discovery doc)
+	// Command to export Agent Card (discovery doc)
     context.subscriptions.push(
         vscode.commands.registerCommand('agent-scheduler.exportAgentCard', async () => {
             try {
@@ -291,7 +301,44 @@ export async function activate(context: vscode.ExtensionContext) {
                 vscode.window.showErrorMessage(`Failed to write Agent Card: ${e?.message || e}`)
             }
         })
-    )
+	)
+
+	// Access key management commands
+	context.subscriptions.push(vscode.commands.registerCommand('agent-scheduler.auth.createKey', async () => {
+		try {
+			const label = await vscode.window.showInputBox({ prompt: 'Label for access key' })
+			if (!label) return
+			const transportsPick = await vscode.window.showQuickPick(['http','grpc','mcp'], { canPickMany: true, placeHolder: 'Transports allowed' })
+			const actionsPick = await vscode.window.showInputBox({ prompt: 'Actions allowed (comma-separated or * for all)', value: '*' })
+			const actions = (actionsPick || '*').split(',').map(s => s.trim()).filter(Boolean) as any
+			const { token, record } = await createKey(context, { label, transports: (transportsPick?.length ? transportsPick : ['http','grpc','mcp']) as any, actions })
+			await vscode.env.clipboard.writeText(token)
+			vscode.window.showInformationMessage(`Access key created (copied to clipboard). ID=${record.id}`)
+		} catch (e:any) {
+			vscode.window.showErrorMessage(`Create key failed: ${e?.message || e}`)
+		}
+	}))
+	context.subscriptions.push(vscode.commands.registerCommand('agent-scheduler.auth.listKeys', async () => {
+		const keys = await listKeys(context)
+		const items = keys.map(k => ({ label: `${k.label} (${k.id})`, description: `${k.enabled ? 'enabled' : 'disabled'}${k.expiresAt ? ' exp:'+k.expiresAt : ''}`, detail: `transports=${k.scopes.transports.join(',')} actions=${k.scopes.actions.join(',')}` }))
+		await vscode.window.showQuickPick(items, { placeHolder: 'Existing access keys' })
+	}))
+	context.subscriptions.push(vscode.commands.registerCommand('agent-scheduler.auth.revokeKey', async () => {
+		const keys = await listKeys(context)
+		const pick = await vscode.window.showQuickPick(keys.map(k => ({ label: k.label, description: k.id })), { placeHolder: 'Select key to revoke' })
+		if (!pick) return
+		await revokeKey(context, pick.description!)
+		vscode.window.showInformationMessage(`Revoked key ${pick.description}`)
+	}))
+	context.subscriptions.push(vscode.commands.registerCommand('agent-scheduler.auth.toggleKey', async () => {
+		const keys = await listKeys(context)
+		const pick = await vscode.window.showQuickPick(keys.map(k => ({ label: `${k.enabled ? 'Disable' : 'Enable'}: ${k.label}`, description: k.id })), { placeHolder: 'Toggle key enabled' })
+		if (!pick) return
+		const key = keys.find(k => k.id === pick.description)
+		if (!key) return
+		await setKeyEnabled(context, key.id, !key.enabled)
+		vscode.window.showInformationMessage(`Key ${key.id} is now ${!key.enabled ? 'enabled' : 'disabled'}`)
+	}))
 }
 
 // This method is called when your extension is deactivated

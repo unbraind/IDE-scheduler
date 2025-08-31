@@ -2,6 +2,7 @@ import * as http from 'http'
 import * as vscode from 'vscode'
 import { z } from 'zod'
 import { handleA2ATrigger } from '../../protocols/a2a'
+import { authorize } from '../../security/auth'
 import { getSetting } from '../../utils/config'
 
 // Expose an MCP server (HTTP streaming) with a single tool `a2a.invoke` that
@@ -57,9 +58,18 @@ export async function startMcpA2AEndpoint(_context: vscode.ExtensionContext) {
         if (!req.url.startsWith(route)) return res.writeHead(404).end()
         const chunks: Buffer[] = []
         req.on('data', (c) => chunks.push(Buffer.isBuffer(c) ? c : Buffer.from(c)))
-        req.on('end', () => {
+        req.on('end', async () => {
           const body = Buffer.concat(chunks).toString('utf8')
-          // Do not await; this is a callback-based HTTP handler
+          // Optional auth for MCP HTTP
+          try {
+            const required = getSetting<boolean>('experimental.auth.mcp.required') ?? false
+            if (required) {
+              const tok = (req.headers['authorization'] as string) || (req.headers['x-agent-key'] as string)
+              const { ok } = await authorize((global as any).__extensionContext, 'mcp', 'invoke', tok)
+              if (!ok) { try { res.writeHead(401).end('Unauthorized') } catch {}; return }
+            }
+          } catch {}
+          // Forward to MCP SDK transport
           void transport.handleRequest(server, req, res, body)
         })
       } catch (e: any) {
