@@ -370,7 +370,8 @@ export class CustomModesManager {
 		let path = this.context.globalStorageUri.fsPath;
 		console.log('Global storage path:', path);
 		if (path) {
-			path = path.replace('globalStorage/kylehoskins.roo-scheduler','globalStorage/rooveterinaryinc.roo-cline');
+			path = path.replace('globalStorage/kylehoskins.roo-scheduler','globalStorage/kylehoskins.kilo-scheduler');
+			path = path.replace('globalStorage/rooveterinaryinc.roo-cline','globalStorage/kilocode.kilo-code');
 		}	
 		return path;	
 	}
