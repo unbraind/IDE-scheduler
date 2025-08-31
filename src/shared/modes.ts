@@ -85,26 +85,13 @@ export function getModeConfig(slug: string, customModes?: ModeConfig[]): ModeCon
 
 // Get all available modes, with custom modes overriding built-in modes
 export function getAllModes(customModes?: ModeConfig[]): ModeConfig[] {
-	if (!customModes?.length) {
-		return [...modes]
-	}
-
-	// Start with built-in modes
-	const allModes = [...modes]
-
-	// Process custom modes
-	customModes.forEach((customMode) => {
-		const index = allModes.findIndex((mode) => mode.slug === customMode.slug)
-		if (index !== -1) {
-			// Override existing mode
-			allModes[index] = customMode
-		} else {
-			// Add new mode
-			allModes.push(customMode)
-		}
-	})
-
-	return allModes
+    // If Kilo Code has provided a modes list via global state, use it 1:1 to
+    // match the user’s active/installed modes and ordering.
+    if (customModes && customModes.length > 0) {
+        return [...customModes]
+    }
+    // Fallback to the built-in minimal set if nothing is provided.
+    return [...modes]
 }
 
 // Check if a mode is custom or an override

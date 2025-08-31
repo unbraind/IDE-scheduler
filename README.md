@@ -9,9 +9,9 @@
 
 </div>
 
-**Kilo Scheduler** is a task scheduling extension for VS Code that seamlessly integrates with [Kilo Code](https://github.com/Kilo-Org/kilocode). It allows you to automate recurring tasks and workflows directly within your development environment.  
+**Kilo Scheduler** is a task scheduling extension for VS Code that seamlessly integrates with [Kilo Code](https://github.com/Kilo-Org/kilocode). It allows you to automate recurring tasks and workflows directly within your development environment.
 
-This extension was created from a fork of Roo Scheduler and adapted to work with [Kilo Code](https://github.com/Kilo-Org/kilocode), using similar patterns/components.
+Important: This project is a fork of [kyle-apex/roo-scheduler](https://github.com/kyle-apex/roo-scheduler). All credit for the original Scheduler concept and implementation belongs to that project. This fork adapts the extension to work natively with Kilo Code (IDs, APIs, config, assets) and maintains feature parity where possible.
 
 ## Key Features
 

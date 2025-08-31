@@ -145,7 +145,7 @@ const ScheduleListItem: React.FC<ScheduleListItemProps> = ({
                     e.stopPropagation();
                     onResumeTask(schedule.lastTaskId!);
                   }}
-                  title="Click to view/resume this task in Roo Code"
+                  title="Click to view/resume this task in Kilo Code"
                 >
                   {formatDate(schedule.lastExecutionTime)}
                 </button>
