@@ -124,6 +124,33 @@ export async function activate(context: vscode.ExtensionContext) {
 		}),
 	)
 
+	// Alias command for AgentScheduler namespace (prep for rename)
+	context.subscriptions.push(
+		vscode.commands.registerCommand("agent-scheduler.a2a.trigger", async (message?: any) => {
+			try {
+				return await handleA2ATrigger(message)
+			} catch (err) {
+				console.warn('A2A trigger failed', err)
+			}
+		}),
+	)
+
+	// Sample command to quickly trigger a demo A2A message
+	context.subscriptions.push(
+		vscode.commands.registerCommand("agent-scheduler.a2a.sample", async () => {
+			const sample = {
+				protocol: 'a2a',
+				version: '1',
+				target: { agent: 'kilocode' },
+				action: 'trigger',
+				payload: { instructions: 'Hello from AgentScheduler sample!' },
+			}
+			const res = await handleA2ATrigger(sample)
+			vscode.window.showInformationMessage(`A2A sample result: ${JSON.stringify(res)}`)
+			return res
+		}),
+	)
+
 	// Define badge updater now that provider exists
 	_updateActivityBadge = async () => {
 		try {

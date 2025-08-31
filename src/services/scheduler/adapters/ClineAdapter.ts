@@ -1,4 +1,4 @@
-import type * as vscode from 'vscode'
+import * as vscode from 'vscode'
 import { ISchedulerAdapter, ScheduleSummary, TriggerOptions } from './ISchedulerAdapter'
 
 /**
@@ -8,12 +8,24 @@ import { ISchedulerAdapter, ScheduleSummary, TriggerOptions } from './IScheduler
 export class ClineAdapter implements ISchedulerAdapter {
   public readonly id = 'cline'
   public readonly title = 'Cline'
+  private triggerId: string | null = null
+  private listId: string | null = null
 
   async initialize(_context: vscode.ExtensionContext): Promise<void> {
-    // No-op for now
+    const cfg = vscode.workspace.getConfiguration('kilo-scheduler')
+    this.triggerId = cfg.get<string>('experimental.agents.cline.triggerCommand') ?? 'cline.newTask'
+    this.listId = cfg.get<string>('experimental.agents.cline.listCommand') ?? null
   }
 
   async listSchedules(): Promise<ScheduleSummary[]> {
+    try {
+      if (this.listId) {
+        const result = await vscode.commands.executeCommand(this.listId)
+        if (Array.isArray(result)) return result as ScheduleSummary[]
+      }
+    } catch (e) {
+      console.warn('ClineAdapter.listSchedules failed', e)
+    }
     return []
   }
 
@@ -26,8 +38,17 @@ export class ClineAdapter implements ISchedulerAdapter {
   }
 
   async triggerAgent(_opts: TriggerOptions): Promise<void> {
-    // No-op for now
-    return
+    try {
+      const cfg = vscode.workspace.getConfiguration('kilo-scheduler')
+      const triggerId = this.triggerId || cfg.get<string>('experimental.agents.cline.triggerCommand') || 'cline.newTask'
+      const payload = {
+        instructions: _opts.instructions,
+        mode: _opts.mode,
+        metadata: _opts.metadata,
+      }
+      await vscode.commands.executeCommand(triggerId, payload)
+    } catch (e) {
+      console.warn('ClineAdapter.triggerAgent failed', e)
+    }
   }
 }
-

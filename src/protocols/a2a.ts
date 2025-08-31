@@ -1,5 +1,6 @@
 import * as vscode from 'vscode'
 import { SchedulerAdapterRegistry } from '../services/scheduler/adapters'
+import { sendA2AOverMCP } from '../integrations/mcp/bridge'
 
 // Minimal A2A (Agent-to-Agent) message shape for experimental use
 export type A2AAction = 'trigger' | 'list' | 'setActive'
@@ -88,6 +89,8 @@ export async function handleA2ATrigger(msg: A2AMessage | any): Promise<any> {
     const mode = (msg.payload?.mode as string) || undefined
     const instructions = (msg.payload?.instructions as string) || undefined
     await adapter.triggerAgent({ mode, instructions, metadata: msg.payload })
+    // Optional MCP forwarding
+    await sendA2AOverMCP(msg)
     return { ok: true }
   }
   if (msg.action === 'list') {

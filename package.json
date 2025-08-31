@@ -200,6 +200,16 @@
 				"command": "kilo-scheduler.a2a.trigger",
 				"title": "A2A: Trigger Agent (Experimental)",
 				"category": "Kilo Scheduler"
+			},
+			{
+				"command": "agent-scheduler.a2a.trigger",
+				"title": "AgentScheduler: A2A Trigger (Experimental)",
+				"category": "Agent Scheduler"
+			},
+			{
+				"command": "agent-scheduler.a2a.sample",
+				"title": "AgentScheduler: Sample A2A Trigger",
+				"category": "Agent Scheduler"
 			}
 		],
 		"menus": {

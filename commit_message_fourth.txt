@@ -1,0 +1,39 @@
+feat(experimental): sample A2A commands, Cline adapter wiring, MCP bridge, and rename prep
+
+Commands
+- Add alias command `agent-scheduler.a2a.trigger` mirroring existing `kilo-scheduler.a2a.trigger`.
+- Add `agent-scheduler.a2a.sample` that sends a demo A2A trigger message and shows the result (for quick manual testing).
+
+Cline adapter (first real wiring)
+- src/services/scheduler/adapters/ClineAdapter.ts:
+  - Reads `kilo-scheduler.experimental.agents.cline.triggerCommand` (default `cline.newTask`) and optional `listCommand`.
+  - triggerAgent: executes the configured command with payload { instructions, mode, metadata }.
+  - listSchedules: executes configured listCommand and returns array if available; otherwise returns [].
+  - All operations are best-effort (try/catch) to avoid breaking users without Cline.
+- package.json (configuration): adds `cline.triggerCommand` and `cline.listCommand` settings with descriptions.
+
+A2A protocol
+- src/protocols/a2a.ts:
+  - Already strict actions: `trigger|list|setActive`. Handler now optionally forwards messages to MCP (see below) and returns { ok, data?, error? }.
+- src/__tests__/protocols/a2a.test.ts:
+  - Added MCP-forwarding test and ensured previous tests still pass.
+
+MCP bridge (experimental)
+- src/integrations/mcp/bridge.ts: `sendA2AOverMCP()` checks `kilo-scheduler.experimental.mcp.enabled` and `...mcp.forward` and sends to `...mcp.endpoint` using mocked @modelcontextprotocol/sdk. Returns { ok, error? }.
+- src/protocols/a2a.ts: forwards trigger events to MCP when enabled.
+- package.json (configuration): adds `experimental.mcp.enabled`, `experimental.mcp.endpoint`, and `experimental.mcp.forward`.
+
+Rename preparation
+- Introduced AgentScheduler namespace for commands: `agent-scheduler.a2a.trigger`, `agent-scheduler.a2a.sample`.
+- Keeps all existing Kilo Scheduler commands intact.
+
+Tests & build
+- All tests passing:
+  - Extension: 245/245
+  - Webview: 57/57
+- VSIX rebuilt: bin/kilo-scheduler-0.0.14.vsix
+
+Notes
+- Cline integration is wired via configurable commands since public programmatic APIs are limited; update settings to match your Cline installation (e.g., change trigger/list command IDs).
+- MCP forwarding uses a lightweight bridge with the SDK mocked under tests; real endpoint usage remains opt-in and guarded by settings.
+- Follow-up: add real command IDs and list semantics for cline once finalized; extend the same pattern to Roo Code, Continue, Cursor, Claude Code, Gemini CLI, and Qwen Coder CLI adapters.

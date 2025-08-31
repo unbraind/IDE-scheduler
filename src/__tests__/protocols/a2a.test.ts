@@ -1,6 +1,7 @@
 import * as vscode from 'vscode'
 import { handleA2ATrigger, validateA2AMessage, A2AMessage } from '../../protocols/a2a'
 import { SchedulerService } from '../../services/scheduler/SchedulerService'
+import * as mcpBridge from '../../integrations/mcp/bridge'
 
 describe('A2A protocol', () => {
   beforeEach(() => {
@@ -107,5 +108,24 @@ describe('A2A protocol', () => {
     const res = await handleA2ATrigger({ protocol: 'a2a', version: '1', target: { agent: 'kilocode' }, action: 'trigger', payload: { instructions: 'x' } })
     expect(res.ok).toBe(false)
     expect(exec).not.toHaveBeenCalled()
+  })
+
+  test('MCP forwarding is attempted when enabled', async () => {
+    jest.spyOn(vscode.workspace, 'getConfiguration').mockReturnValue({
+      get: jest.fn((key: string) => {
+        if (key === 'experimental.crossIde') return true
+        if (key === 'experimental.mcp.enabled') return true
+        if (key === 'experimental.mcp.forward') return true
+        if (key === 'experimental.mcp.endpoint') return 'http://localhost:4000'
+        return undefined
+      }),
+    } as any)
+
+    const spy = jest.spyOn(mcpBridge, 'sendA2AOverMCP').mockResolvedValue({ ok: true })
+    const res = await handleA2ATrigger({
+      protocol: 'a2a', version: '1', target: { agent: 'kilocode' }, action: 'trigger', payload: { instructions: 'x' }
+    })
+    expect(res.ok).toBe(true)
+    expect(spy).toHaveBeenCalled()
   })
 })
