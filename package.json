@@ -68,9 +68,97 @@
 					"type": "boolean",
 					"default": false,
 					"description": "Experimental (WIP): Enable cross-IDE scheduling interface + Agent-to-Agent trigger support. Very early WIP (cline, roo-code, Continue, Cursor, Claude Code, Gemini CLI, Qwen Coder CLI)."
-				}
+				},
+				"kilo-scheduler.experimental.agents.kilocode.enabled": {
+					"type": "boolean",
+					"default": true,
+					"description": "Enable Kilo Code adapter (experimental cross-IDE)."
+				},
+				"kilo-scheduler.experimental.agents.kilocode.allowedActions": {
+					"type": "array",
+					"description": "Allowed A2A actions for Kilo Code adapter.",
+					"items": { "type": "string", "enum": ["trigger", "list", "setActive"] },
+					"default": ["trigger", "list", "setActive"]
+				},
+				"kilo-scheduler.experimental.agents.cline.enabled": {
+					"type": "boolean",
+					"default": false,
+					"description": "Enable Cline adapter (experimental cross-IDE)."
+				},
+				"kilo-scheduler.experimental.agents.cline.allowedActions": {
+					"type": "array",
+					"description": "Allowed A2A actions for Cline adapter.",
+					"items": { "type": "string", "enum": ["trigger", "list", "setActive"] },
+					"default": ["trigger"]
+				},
+				"kilo-scheduler.experimental.agents.rooCode.enabled": {
+					"type": "boolean",
+					"default": false,
+					"description": "Enable Roo Code adapter (experimental cross-IDE)."
+				},
+				"kilo-scheduler.experimental.agents.rooCode.allowedActions": {
+					"type": "array",
+					"description": "Allowed A2A actions for Roo Code adapter.",
+					"items": { "type": "string", "enum": ["trigger", "list", "setActive"] },
+					"default": ["trigger"]
+				},
+				"kilo-scheduler.experimental.agents.continue.enabled": {
+					"type": "boolean",
+					"default": false,
+					"description": "Enable Continue adapter (experimental cross-IDE)."
+				},
+				"kilo-scheduler.experimental.agents.continue.allowedActions": {
+					"type": "array",
+					"description": "Allowed A2A actions for Continue adapter.",
+					"items": { "type": "string", "enum": ["trigger", "list", "setActive"] },
+					"default": ["trigger"]
+				},
+				"kilo-scheduler.experimental.agents.cursor.enabled": {
+					"type": "boolean",
+					"default": false,
+					"description": "Enable Cursor adapter (experimental cross-IDE)."
+				},
+				"kilo-scheduler.experimental.agents.cursor.allowedActions": {
+					"type": "array",
+					"description": "Allowed A2A actions for Cursor adapter.",
+					"items": { "type": "string", "enum": ["trigger", "list", "setActive"] },
+					"default": ["trigger"]
+				},
+				"kilo-scheduler.experimental.agents.claudeCode.enabled": {
+					"type": "boolean",
+					"default": false,
+					"description": "Enable Claude Code adapter (experimental cross-IDE)."
+				},
+				"kilo-scheduler.experimental.agents.claudeCode.allowedActions": {
+					"type": "array",
+					"description": "Allowed A2A actions for Claude Code adapter.",
+					"items": { "type": "string", "enum": ["trigger", "list", "setActive"] },
+					"default": ["trigger"]
+				},
+				"kilo-scheduler.experimental.agents.geminiCli.enabled": {
+					"type": "boolean",
+					"default": false,
+					"description": "Enable Google Gemini CLI adapter (experimental cross-IDE)."
+				},
+				"kilo-scheduler.experimental.agents.geminiCli.allowedActions": {
+					"type": "array",
+					"description": "Allowed A2A actions for Gemini CLI adapter.",
+					"items": { "type": "string", "enum": ["trigger", "list", "setActive"] },
+					"default": ["trigger"]
+				},
+				"kilo-scheduler.experimental.agents.qwenCli.enabled": {
+					"type": "boolean",
+					"default": false,
+					"description": "Enable Qwen Coder CLI adapter (experimental cross-IDE)."
+				},
+				"kilo-scheduler.experimental.agents.qwenCli.allowedActions": {
+					"type": "array",
+					"description": "Allowed A2A actions for Qwen CLI adapter.",
+					"items": { "type": "string", "enum": ["trigger", "list", "setActive"] },
+					"default": ["trigger"]
 				}
 			}
+		}
 		},
 		"viewsContainers": {
 			"activitybar": [

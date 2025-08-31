@@ -1,0 +1,60 @@
+feat(experimental): add granular agent settings, no‑op adapters (Continue, Cursor, Claude Code, Gemini CLI, Qwen CLI), and comprehensive A2A tests
+
+Granular agent settings (fully implemented)
+- package.json (contributes.configuration):
+  - `kilo-scheduler.experimental.crossIde` toggle remains.
+  - Per‑adapter controls under `kilo-scheduler.experimental.agents.*`:
+    - `*.enabled` (boolean): enable/disable adapter (kilocode defaults true; others false).
+    - `*.allowedActions` (array enum): restrict actions per adapter. Defaults:
+      - Kilo Code: ["trigger", "list", "setActive"]
+      - Others: ["trigger"]
+
+Adapters (WIP scaffolding)
+- New no‑op adapters:
+  - ContinueAdapter (id: `continue`)
+  - CursorAdapter (id: `cursor`)
+  - ClaudeCodeAdapter (id: `claudeCode`)
+  - GeminiCliAdapter (id: `geminiCli`)
+  - QwenCoderCliAdapter (id: `qwenCli`)
+- Existing adapters:
+  - KiloCodeAdapter: now uses `toggleScheduleActive` (fallback to update) and lists schedules via SchedulerService.
+  - ClineAdapter, RooCodeAdapter (no‑ops) kept.
+- Registry (adapters/index.ts): always registers Kilo Code; registers other adapters when `experimental.crossIde` is true and per‑adapter `enabled` settings are true.
+
+A2A schema & semantics
+- src/protocols/a2a.ts:
+  - Introduced strict action union: `A2AAction = 'trigger' | 'list' | 'setActive'`.
+  - Extended payload typing for `mode`, `instructions`, `scheduleId`, and `active`.
+  - `validateA2AMessage()` validates protocol, version, target.agent, action membership, payload presence/shape for `setActive`.
+  - `handleA2ATrigger()` now:
+    - Respects `experimental.crossIde` and per‑adapter `*.allowedActions`.
+    - Routes actions:
+      - `trigger` → `adapter.triggerAgent()`
+      - `list` → returns array of schedule summaries
+      - `setActive` → `adapter.setActive(scheduleId, active)`
+    - Returns `{ ok, data?, error? }` so callers (and tests) can assert outcomes.
+    - Defaults allowedActions to full set for Kilo Code, and ["trigger"] for others if config is unset.
+
+Comprehensive tests
+- src/__tests__/protocols/a2a.test.ts:
+  - Valid/invalid message shape assertions.
+  - Disabled cross‑IDE gating surface (info message path).
+  - Enabled path triggers Kilo Code via command and returns `{ ok: true }`.
+  - `list` action returns seeded summaries (SchedulerService instance stubbed).
+  - `setActive` validates payload and forwards to scheduler toggle.
+  - `allowedActions` gating prevents disallowed `trigger` and avoids command invocation.
+
+VS Code command and context
+- src/extension.ts:
+  - A2A command now returns the result of `handleA2ATrigger()`.
+  - Global `__extensionContext` exposed for adapter init; adapter registry initialized early.
+
+Build & results
+- All tests passing:
+  - Extension: 244/244
+  - Webview: 57/57
+- VSIX rebuilt: bin/kilo-scheduler-0.0.14.vsix
+
+Notes
+- Adapters are intentionally no‑op to wire the surface with full settings control; future work can implement real bridges for each IDE/CLI.
+- Existing functionality is unchanged for non‑experimental users; everything is gated behind settings.

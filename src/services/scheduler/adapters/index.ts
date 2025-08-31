@@ -3,6 +3,11 @@ import { ISchedulerAdapter } from './ISchedulerAdapter'
 import { KiloCodeAdapter } from './KiloCodeAdapter'
 import { ClineAdapter } from './ClineAdapter'
 import { RooCodeAdapter } from './RooCodeAdapter'
+import { ContinueAdapter } from './ContinueAdapter'
+import { CursorAdapter } from './CursorAdapter'
+import { ClaudeCodeAdapter } from './ClaudeCodeAdapter'
+import { GeminiCliAdapter } from './GeminiCliAdapter'
+import { QwenCoderCliAdapter } from './QwenCoderCliAdapter'
 
 export class SchedulerAdapterRegistry {
   private static _instance: SchedulerAdapterRegistry
@@ -23,11 +28,22 @@ export class SchedulerAdapterRegistry {
     // Conditionally register experimental adapters
     const crossIde = vscode.workspace.getConfiguration('kilo-scheduler').get<boolean>('experimental.crossIde') ?? false
     if (crossIde) {
-      const cline = new ClineAdapter()
-      const roo = new RooCodeAdapter()
-      this.adapters.set(cline.id, cline)
-      this.adapters.set(roo.id, roo)
-      await Promise.all([cline.initialize(context), roo.initialize(context)])
+      const cfg = vscode.workspace.getConfiguration('kilo-scheduler')
+      const enabled = (key: string, def = false) => cfg.get<boolean>(`experimental.agents.${key}.enabled`) ?? def
+
+      const creations: ISchedulerAdapter[] = []
+      if (enabled('cline')) creations.push(new ClineAdapter())
+      if (enabled('rooCode')) creations.push(new RooCodeAdapter())
+      if (enabled('continue')) creations.push(new ContinueAdapter())
+      if (enabled('cursor')) creations.push(new CursorAdapter())
+      if (enabled('claudeCode')) creations.push(new ClaudeCodeAdapter())
+      if (enabled('geminiCli')) creations.push(new GeminiCliAdapter())
+      if (enabled('qwenCli')) creations.push(new QwenCoderCliAdapter())
+
+      for (const adapter of creations) {
+        this.adapters.set(adapter.id, adapter)
+      }
+      await Promise.all(creations.map(a => a.initialize(context)))
     }
     this.initialized = true
   }

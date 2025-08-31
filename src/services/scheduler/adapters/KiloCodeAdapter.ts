@@ -35,7 +35,11 @@ export class KiloCodeAdapter implements ISchedulerAdapter {
   async setActive(scheduleId: string, active: boolean): Promise<void> {
     const svc = (SchedulerService as any).instance as SchedulerService | undefined
     if (!svc) return
-    await (svc as any).setScheduleActive?.(scheduleId, active)
+    if ((svc as any).toggleScheduleActive) {
+      await (svc as any).toggleScheduleActive(scheduleId, active)
+    } else if ((svc as any).updateSchedule) {
+      await (svc as any).updateSchedule(scheduleId, { active })
+    }
   }
 
   async triggerAgent(opts: TriggerOptions): Promise<void> {
@@ -55,4 +59,3 @@ export class KiloCodeAdapter implements ISchedulerAdapter {
     }
   }
 }
-

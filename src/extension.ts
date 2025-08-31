@@ -117,7 +117,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	context.subscriptions.push(
 		vscode.commands.registerCommand("kilo-scheduler.a2a.trigger", async (message?: any) => {
 			try {
-				await handleA2ATrigger(message)
+				return await handleA2ATrigger(message)
 			} catch (err) {
 				console.warn('A2A trigger failed', err)
 			}
