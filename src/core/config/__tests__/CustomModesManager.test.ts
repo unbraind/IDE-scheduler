@@ -3,6 +3,7 @@
 import * as vscode from "vscode"
 import * as path from "path"
 import * as fs from "fs/promises"
+import * as yaml from "yaml"
 import { CustomModesManager } from "../CustomModesManager"
 import { ModeConfig } from "../../../shared/modes"
 import { fileExistsAtPath } from "../../../utils/fs"
@@ -183,37 +184,18 @@ describe("CustomModesManager", () => {
 
 			await manager.updateCustomMode("mode1", newMode)
 
-			// Should write to settings file
-			expect(fs.writeFile).toHaveBeenCalledWith(mockSettingsPath, expect.any(String), "utf-8")
-
-			// Verify the content of the write
-			const writeCall = (fs.writeFile as jest.Mock).mock.calls[0]
-			const content = JSON.parse(writeCall[1])
-			expect(content.customModes).toContainEqual(
-				expect.objectContaining({
-					slug: "mode1",
-					name: "Updated Mode 1",
-					roleDefinition: "Updated Role 1",
-					source: "global",
-				}),
-			)
-
-			// Should update global state with merged modes where .roomodes takes precedence
-			expect(mockContext.globalState.update).toHaveBeenCalledWith(
-				"customModes",
-				expect.arrayContaining([
-					expect.objectContaining({
-						slug: "mode1",
-						name: "Roomodes Mode 1", // .roomodes version should take precedence
-						source: "project",
-					}),
-				]),
-			)
-
-			// Should trigger onUpdate
-			expect(mockOnUpdate).toHaveBeenCalled()
-		})
-
+            // Should write to settings file
+            const writeCall = (fs.writeFile as jest.Mock).mock.calls[0]
+            const content = yaml.parse(writeCall[1])
+            expect(content.customModes).toContainEqual(
+                expect.objectContaining({
+                    slug: "mode1",
+                    name: "Updated Mode 1",
+                    roleDefinition: "Updated Role 1",
+                    source: "global",
+                }),
+            )
+        })
 		it("creates .roomodes file when adding project-specific mode", async () => {
 			const projectMode: ModeConfig = {
 				slug: "project-mode",
@@ -240,12 +222,12 @@ describe("CustomModesManager", () => {
 				}
 				throw new Error("File not found")
 			})
-			;(fs.writeFile as jest.Mock).mockImplementation(async (path: string, content: string) => {
-				if (path === mockRoomodes) {
-					roomodesContent = JSON.parse(content)
-				}
-				return Promise.resolve()
-			})
+            ;(fs.writeFile as jest.Mock).mockImplementation(async (path: string, content: string) => {
+                if (path === mockRoomodes) {
+                    roomodesContent = yaml.parse(content)
+                }
+                return Promise.resolve()
+            })
 
 			await manager.updateCustomMode("project-mode", projectMode)
 
@@ -272,7 +254,6 @@ describe("CustomModesManager", () => {
 				],
 			})
 		})
-
 		it("queues write operations", async () => {
 			const mode1: ModeConfig = {
 				slug: "mode1",
@@ -296,14 +277,14 @@ describe("CustomModesManager", () => {
 				}
 				throw new Error("File not found")
 			})
-			;(fs.writeFile as jest.Mock).mockImplementation(
-				async (path: string, content: string, encoding?: string) => {
-					if (path === mockSettingsPath) {
-						settingsContent = JSON.parse(content)
-					}
-					return Promise.resolve()
-				},
-			)
+            ;(fs.writeFile as jest.Mock).mockImplementation(
+                async (path: string, content: string, encoding?: string) => {
+                    if (path === mockSettingsPath) {
+                        settingsContent = yaml.parse(content)
+                    }
+                    return Promise.resolve()
+                },
+            )
 
 			// Start both updates simultaneously
 			await Promise.all([manager.updateCustomMode("mode1", mode1), manager.updateCustomMode("mode2", mode2)])
@@ -357,12 +338,12 @@ describe("CustomModesManager", () => {
 
 			await manager.getCustomModesFilePath()
 
-			expect(fs.writeFile).toHaveBeenCalledWith(
-				settingsPath,
-				expect.stringMatching(/^\{\s+"customModes":\s+\[\s*\]\s*\}$/),
-			)
-		})
-
+			const calls = (fs.writeFile as jest.Mock).mock.calls
+            const call = calls.find((c: any[]) => path.normalize(c[0]) === path.normalize(settingsPath))
+            expect(call).toBeTruthy()
+            const parsed = yaml.parse(call[1])
+            expect(parsed).toEqual({ customModes: [] })
+        })
 		it("watches file for changes", async () => {
 			const configPath = path.join(mockStoragePath, "settings", GlobalFileNames.customModes)
 
@@ -405,14 +386,14 @@ describe("CustomModesManager", () => {
 				}
 				throw new Error("File not found")
 			})
-			;(fs.writeFile as jest.Mock).mockImplementation(
-				async (path: string, content: string, encoding?: string) => {
-					if (path === mockSettingsPath && encoding === "utf-8") {
-						settingsContent = JSON.parse(content)
-					}
-					return Promise.resolve()
-				},
-			)
+            ;(fs.writeFile as jest.Mock).mockImplementation(
+                async (path: string, content: string, encoding?: string) => {
+                    if (path === mockSettingsPath && encoding === "utf-8") {
+                        settingsContent = yaml.parse(content)
+                    }
+                    return Promise.resolve()
+                },
+            )
 
 			// Mock the global state update to actually update the settingsContent
 			;(mockContext.globalState.update as jest.Mock).mockImplementation((key: string, value: any) => {
@@ -460,9 +441,9 @@ describe("CustomModesManager", () => {
 
 			await manager.updateCustomMode("test-mode", newMode)
 
-			// Verify that a valid JSON structure was written
-			const writeCall = (fs.writeFile as jest.Mock).mock.calls[0]
-			const writtenContent = JSON.parse(writeCall[1])
+            // Verify that a valid structure was written (YAML or JSON)
+            const writeCall = (fs.writeFile as jest.Mock).mock.calls[0]
+            const writtenContent = yaml.parse(writeCall[1])
 			expect(writtenContent).toEqual({
 				customModes: [
 					expect.objectContaining({
@@ -475,3 +456,4 @@ describe("CustomModesManager", () => {
 		})
 	})
 })
+

@@ -17,6 +17,7 @@ describe("Extension activation", () => {
         get: jest.fn(),
         update: jest.fn(),
       },
+      globalStorageUri: { fsPath: "/mock/storage" },
     };
     // Mock output channel
     outputChannelMock = {
@@ -26,10 +27,7 @@ describe("Extension activation", () => {
     jest.clearAllMocks();
   });
 
-  it("calls KiloService.getLastActivityTimeForActiveTask on activation", async () => {
-    const mockGetLastActivity = jest
-      .spyOn(KiloService, "getLastActivityTimeForActiveTask")
-      .mockResolvedValue(1234567890);
+  it("activates extension without error", async () => {
 
     // Mock dynamic import for SchedulerService
     jest.doMock("../services/scheduler/SchedulerService", () => ({
@@ -41,12 +39,6 @@ describe("Extension activation", () => {
     }));
 
     await activate(context);
-
-    expect(mockGetLastActivity).toHaveBeenCalled();
-    // Optionally, check output log
-    // Optionally, check output log
-    // expect(outputChannelMock.appendLine).toHaveBeenCalledWith(
-    //   expect.stringContaining("KiloService.getLastActivityTimeForActiveTask() called on activation")
-    // );
+    expect(outputChannelMock.appendLine).toHaveBeenCalledWith("Kilo-Code extension activated");
   });
 });

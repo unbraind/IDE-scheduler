@@ -14,6 +14,7 @@ const vscode = {
 		createTextEditorDecorationType: jest.fn().mockReturnValue({
 			dispose: jest.fn(),
 		}),
+		registerWebviewViewProvider: jest.fn(() => ({ dispose: jest.fn() })),
 		tabGroups: {
 			onDidChangeTabs: jest.fn(() => {
 				return {
@@ -40,9 +41,15 @@ const vscode = {
 		fs: {
 			stat: jest.fn(),
 		},
+		getConfiguration: jest.fn(() => ({ get: jest.fn(() => []) })),
 	},
 	extensions: {
 		getExtension: jest.fn(),
+	},
+	commands: {
+		executeCommand: jest.fn().mockResolvedValue(undefined),
+		getCommands: jest.fn().mockResolvedValue([]),
+		registerCommand: jest.fn(() => ({ dispose: jest.fn() })),
 	},
 	Disposable: class {
 		dispose() {}
@@ -109,6 +116,13 @@ const vscode = {
 			this.pattern = pattern
 		}
 	},
+	languages: {
+		registerCodeActionsProvider: jest.fn(() => ({ dispose: jest.fn() })),
+	},
+    CodeActionKind: {
+        QuickFix: { value: 'quickfix' },
+        RefactorRewrite: { value: 'refactor.rewrite' },
+    },
 }
 
 module.exports = vscode

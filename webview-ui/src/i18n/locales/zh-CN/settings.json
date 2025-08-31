@@ -283,8 +283,8 @@
 			"description": "允许纳入上下文的最大文件数（值越大消耗token越多）"
 		},
 		"rooignore": {
-			"label": "在列表和搜索中显示 \.kiloignore 文件",
-			"description": "启用后，与 \.kiloignore 中模式匹配的文件将在列表中显示锁定符号。禁用时，这些文件将从文件列表和搜索中完全隐藏。"
+			"label": "在列表和搜索中显示 .kiloignore 文件",
+			"description": "启用后，与 .kiloignore 中模式匹配的文件将在列表中显示锁定符号。禁用时，这些文件将从文件列表和搜索中完全隐藏。"
 		},
 		"maxReadFile": {
 			"label": "文件读取自动截断阈值",
