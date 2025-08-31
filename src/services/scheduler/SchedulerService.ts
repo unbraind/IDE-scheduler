@@ -122,7 +122,14 @@ export class SchedulerService {
     try {
       const exists = await fileExistsAtPath(this.schedulesFilePath);
       if (!exists) {
-        this.log(`Schedules file not found at ${this.schedulesFilePath}`);
+        // Ensure directory exists and create an empty schedules file for robustness
+        try {
+          await fs.mkdir(path.dirname(this.schedulesFilePath), { recursive: true });
+          await fs.writeFile(this.schedulesFilePath, JSON.stringify({ schedules: [] }, null, 2), 'utf-8');
+          this.log(`Created schedules file at ${this.schedulesFilePath}`);
+        } catch (createErr) {
+          this.log(`Failed to create schedules file at ${this.schedulesFilePath}: ${createErr instanceof Error ? createErr.message : String(createErr)}`);
+        }
         this.schedules = [];
         return;
       }
@@ -147,6 +154,14 @@ export class SchedulerService {
     } catch (error) {
       this.log(`Error saving schedules: ${error instanceof Error ? error.message : String(error)}`);
     }
+  }
+
+  /**
+   * Returns the number of currently active schedules.
+   * A schedule is considered active if its `active` flag is not explicitly set to false.
+   */
+  public getActiveScheduleCount(): number {
+    return this.schedules.filter((s) => s.active !== false).length
   }
 
   private setupTimers(): void {
@@ -175,7 +190,7 @@ export class SchedulerService {
     
     if (schedule.scheduleType === 'time') {
       // Check if schedule has expired before calculating next execution time
- 
+
       const nextExecutionTime = this.calculateNextExecutionTime(schedule);
 
       if (!nextExecutionTime) {
@@ -207,6 +222,10 @@ export class SchedulerService {
         
       }
 
+      if (!nextExecutionTime) {
+        this.log(`Schedule "${schedule.name}" has no next execution time based on its configuration.`);
+        return;
+      }
       const delay = nextExecutionTime.getTime() - Date.now();
       if (delay <= 0) {
         this.log(`Schedule "${schedule.name}" is due for immediate execution`);

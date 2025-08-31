@@ -1,16 +1,11 @@
 import * as vscode from 'vscode';
 import { KiloCodeAPI } from '../../kilo-code';
+import { ModeConfig } from '../../shared/modes';
 
 /**
  * Service for interacting with the Kilo Code extension.
  */
 export class KiloService {
-  /**
-   * Starts a new task in the Kilo Code extension with the specified mode and instructions.
-   * @param mode The mode slug to use.
-   * @param taskInstructions The instructions for the task.
-   * @throws Error if the Kilo Code extension or its API is not available.
-  */
   /**
    * Starts a new task in the Kilo Code extension with the specified mode and instructions.
    * @param mode The mode slug to use.
@@ -40,6 +35,36 @@ export class KiloService {
     });
     console.log('got taskId', taskId);
     return taskId;
+  }
+
+  /**
+   * Gets the available modes from Kilo Code extension.
+   * @returns Promise<ModeConfig[]> - Array of available modes
+   */
+  public static async getAvailableModes(): Promise<ModeConfig[]> {
+    try {
+      const api = KiloService.getKiloCodeApi();
+      const config = api.getConfiguration();
+      
+      // Check if customModes exists in the configuration
+      if (config.customModes && Array.isArray(config.customModes) && config.customModes.length > 0) {
+        // Return the modes from Kilo Code configuration
+        return config.customModes.map(mode => ({
+          slug: mode.slug,
+          name: mode.name,
+          roleDefinition: mode.roleDefinition,
+          groups: mode.groups,
+          customInstructions: mode.customInstructions,
+          source: mode.source
+        }));
+      }
+      
+      // Fallback to empty array if no modes found
+      return [];
+    } catch (error) {
+      console.error("Error fetching modes from Kilo Code:", error);
+      return []; // Return empty array on error
+    }
   }
 
   /**

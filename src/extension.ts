@@ -52,6 +52,9 @@ export async function activate(context: vscode.ExtensionContext) {
 	// Initialize the scheduler service
 	const { SchedulerService } = await import('./services/scheduler/SchedulerService')
 	const schedulerService = SchedulerService.getInstance(context)
+
+	// Hook to update an Activity Bar badge showing active schedules when enabled
+	let _updateActivityBadge: (() => Promise<void>) | null = null
 	await schedulerService.initialize()
 	outputChannel.appendLine("Scheduler service initialized")
 
@@ -83,11 +86,15 @@ export async function activate(context: vscode.ExtensionContext) {
 
 	// Register command to handle schedule updates and notify the webview
 	context.subscriptions.push(
-    vscode.commands.registerCommand("kilo-scheduler.schedulesUpdated", async () => {
+		vscode.commands.registerCommand("kilo-scheduler.schedulesUpdated", async () => {
 			// This command is called when schedules are updated
 			// Simply trigger a state refresh which will cause the webview to reload its data
 			console.log("Schedules updated sending message to webview")
-			await provider.postMessageToWebview({type:'schedulesUpdated'});
+			await provider.postMessageToWebview({ type: 'schedulesUpdated' })
+			// Update the activity badge (if configured and provider is ready)
+			if (_updateActivityBadge) {
+				await _updateActivityBadge()
+			}
 		})
 	)
 
@@ -99,6 +106,43 @@ export async function activate(context: vscode.ExtensionContext) {
 			webviewOptions: { retainContextWhenHidden: true },
 		}),
 	)
+
+	// Define badge updater now that provider exists
+	_updateActivityBadge = async () => {
+		try {
+			const enabled = vscode.workspace.getConfiguration('kilo-scheduler').get<boolean>('experimental.activityBadge') ?? false
+			const view = (provider as any).view
+			if (!view || typeof view !== 'object' || !('badge' in view)) {
+				return
+			}
+			if (!enabled) {
+				view.badge = undefined
+				return
+			}
+			const count = schedulerService.getActiveScheduleCount()
+			if (count > 0) {
+				view.badge = { value: count, tooltip: `${count} active schedule${count === 1 ? '' : 's'}` }
+			} else {
+				view.badge = undefined
+			}
+		} catch (err) {
+			console.warn('Failed to update activity badge', err)
+		}
+	}
+
+	// React to configuration changes for the experimental badge
+	context.subscriptions.push(
+		vscode.workspace.onDidChangeConfiguration((e) => {
+			if (e.affectsConfiguration('kilo-scheduler.experimental.activityBadge') && _updateActivityBadge) {
+				_updateActivityBadge()
+			}
+		}),
+	)
+
+	// Initialize badge once on activation (if the view supports it and setting is enabled)
+	if (_updateActivityBadge) {
+		_updateActivityBadge()
+	}
 
 
 	/**

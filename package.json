@@ -2,9 +2,9 @@
 	"name": "kilo-scheduler",
 	"displayName": "Kilo Scheduler",
 	"description": "A task scheduler for Kilo Code",
-	"publisher": "KyleHoskins",
-	"version": "0.0.11",
-	"icon": "assets/icons/scheduler-icon.png",
+	"publisher": "unbrained",
+	"version": "0.0.14",
+	"icon": "assets/icons/scheduler-icon-light.png",
 	"galleryBanner": {
 		"color": "#617A91",
 		"theme": "dark"
@@ -14,13 +14,14 @@
 		"node": "20.18.1"
 	},
 	"author": {
-		"name": "Kilo Scheduler"
+		"name": "Stefan Preu",
+		"url": "https://github.com/unbraind"
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/kyle-apex/kilo-scheduler"
+		"url": "https://github.com/unbrained/IDE-scheduler"
 	},
-	"homepage": "https://github.com/kyle-apex/kilo-scheduler",
+	"homepage": "https://github.com/unbrained/IDE-scheduler",
 	"categories": [
 		"AI",
 		"Chat",
@@ -55,12 +56,25 @@
 		"kilocode.kilo-code"
 	],
 	"contributes": {
+		"configuration": {
+			"title": "Kilo Scheduler",
+			"properties": {
+				"kilo-scheduler.experimental.activityBadge": {
+					"type": "boolean",
+					"default": false,
+					"description": "Experimental: show the number of active schedules as a badge on the Kilo Scheduler Activity Bar icon."
+				}
+			}
+		},
 		"viewsContainers": {
 			"activitybar": [
 				{
 					"id": "kilo-scheduler-ActivityBar",
 					"title": "Kilo Scheduler",
-					"icon": "assets/icons/kilo-light.svg"
+					"icon": {
+						"light": "assets/icons/scheduler-icon-light.png",
+						"dark": "assets/icons/scheduler-icon-dark.png"
+					}
 				}
 			]
 		},
@@ -84,8 +98,8 @@
 				"command": "kilo-scheduler.openKiloCodeExtension",
 				"title": "Open Kilo Code Extension",
 				"icon": {
-					"light": "assets/icons/kilo-dark.svg",
-					"dark": "assets/icons/kilo-light.svg"
+					"light": "assets/icons/scheduler-icon-light.png",
+					"dark": "assets/icons/scheduler-icon-dark.png"
 				}
 			}
 		],
@@ -157,6 +171,7 @@
 		"@anthropic-ai/sdk": "^0.37.0",
 		"@anthropic-ai/vertex-sdk": "^0.7.0",
 		"@aws-sdk/client-bedrock-runtime": "^3.817.0",
+		"@genkit-ai/mcp": "^1.18.0",
 		"@google-cloud/vertexai": "^1.9.3",
 		"@google/generative-ai": "^0.18.0",
 		"@mistralai/mistralai": "^1.3.6",

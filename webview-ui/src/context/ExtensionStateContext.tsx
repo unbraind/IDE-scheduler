@@ -62,6 +62,7 @@ export interface ExtensionStateContextType extends ExtensionState {
 	setEnhancementApiConfigId: (value: string) => void
 	setAutoApprovalEnabled: (value: boolean) => void
 	customModes: ModeConfig[]
+	kiloCodeModes: ModeConfig[] // Add the actual modes from Kilo Code extension
 	setCustomModes: (value: ModeConfig[]) => void
 	setMaxOpenTabsContext: (value: number) => void
 	maxWorkspaceFiles: number
@@ -140,6 +141,7 @@ export const ExtensionStateContextProvider: React.FC<{ children: React.ReactNode
 		enhancementApiConfigId: "",
 		autoApprovalEnabled: false,
 		customModes: [],
+		kiloCodeModes: [], // Initialize with empty array
 		maxOpenTabsContext: 20,
 		maxWorkspaceFiles: 200,
 		cwd: "",

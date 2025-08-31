@@ -127,6 +127,108 @@ jest.mock("../../../../src/shared/modes", () => ({
   ]
 }));
 
+// Mock the ExtensionStateContext to provide kiloCodeModes
+const mockExtensionState = {
+  version: "",
+  clineMessages: [],
+  taskHistory: [],
+  shouldShowAnnouncement: false,
+  allowedCommands: [],
+  soundEnabled: false,
+  soundVolume: 0.5,
+  ttsEnabled: false,
+  ttsSpeed: 1.0,
+  diffEnabled: false,
+  enableCheckpoints: true,
+  checkpointStorage: "task",
+  fuzzyMatchThreshold: 1.0,
+  language: "en",
+  writeDelayMs: 1000,
+  browserViewportSize: "900x600",
+  screenshotQuality: 75,
+  terminalOutputLineLimit: 500,
+  terminalShellIntegrationTimeout: 4000,
+  mcpEnabled: true,
+  enableMcpServerCreation: true,
+  alwaysApproveResubmit: false,
+  requestDelaySeconds: 5,
+  currentApiConfigName: "default",
+  listApiConfigMeta: [],
+  mode: "code",
+  customModePrompts: {},
+  customSupportPrompts: {},
+  enhancementApiConfigId: "",
+  autoApprovalEnabled: false,
+  customModes: [],
+  kiloCodeModes: [], // Initialize with empty array
+  maxOpenTabsContext: 20,
+  maxWorkspaceFiles: 200,
+  cwd: "",
+  browserToolEnabled: true,
+  telemetrySetting: "unset",
+  showRooIgnoredFiles: true,
+  renderContext: "sidebar",
+  maxReadFileLine: 500,
+  pinnedApiConfigs: {},
+  experiments: { search_and_replace: false, insert_content: false, powerSteering: false },
+  didHydrateState: true,
+  showWelcome: false,
+  theme: undefined,
+  currentCheckpoint: undefined,
+  filePaths: [],
+  openedTabs: [],
+  setCustomInstructions: jest.fn(),
+  setAlwaysAllowReadOnly: jest.fn(),
+  setAlwaysAllowReadOnlyOutsideWorkspace: jest.fn(),
+  setAlwaysAllowWrite: jest.fn(),
+  setAlwaysAllowWriteOutsideWorkspace: jest.fn(),
+  setAlwaysAllowExecute: jest.fn(),
+  setAlwaysAllowBrowser: jest.fn(),
+  setAlwaysAllowMcp: jest.fn(),
+  setAlwaysAllowModeSwitch: jest.fn(),
+  setAlwaysAllowSubtasks: jest.fn(),
+  setBrowserToolEnabled: jest.fn(),
+  setShowRooIgnoredFiles: jest.fn(),
+  setShowAnnouncement: jest.fn(),
+  setAllowedCommands: jest.fn(),
+  setSoundEnabled: jest.fn(),
+  setSoundVolume: jest.fn(),
+  setTerminalShellIntegrationTimeout: jest.fn(),
+  setTtsEnabled: jest.fn(),
+  setTtsSpeed: jest.fn(),
+  setDiffEnabled: jest.fn(),
+  setEnableCheckpoints: jest.fn(),
+  setBrowserViewportSize: jest.fn(),
+  setFuzzyMatchThreshold: jest.fn(),
+  setWriteDelayMs: jest.fn(),
+  setScreenshotQuality: jest.fn(),
+  setTerminalOutputLineLimit: jest.fn(),
+  setMcpEnabled: jest.fn(),
+  setEnableMcpServerCreation: jest.fn(),
+  setAlwaysApproveResubmit: jest.fn(),
+  setRequestDelaySeconds: jest.fn(),
+  setCurrentApiConfigName: jest.fn(),
+  setListApiConfigMeta: jest.fn(),
+  setMode: jest.fn(),
+  setCustomModePrompts: jest.fn(),
+  setEnhancementApiConfigId: jest.fn(),
+  setAutoApprovalEnabled: jest.fn(),
+  setCustomModes: jest.fn(),
+  setMaxOpenTabsContext: jest.fn(),
+  setMaxWorkspaceFiles: jest.fn(),
+  setRemoteBrowserEnabled: jest.fn(),
+  setAwsUsePromptCache: jest.fn(),
+  setMaxReadFileLine: jest.fn(),
+  setPinnedApiConfigs: jest.fn(),
+  togglePinnedApiConfig: jest.fn(),
+};
+
+jest.mock("../../context/ExtensionStateContext", () => ({
+  useExtensionState: () => mockExtensionState,
+  ExtensionStateContextProvider: ({ children }: { children: React.ReactNode }) => (
+    <div data-testid="extension-state-provider">{children}</div>
+  ),
+}));
 
 describe("SchedulerView", () => {
   function renderWithProvider() {
@@ -317,7 +419,7 @@ describe("SchedulerView", () => {
         expect(screen.getByText(/Last executed:/)).toBeInTheDocument();
       });
       expect(screen.getByText(formatDateWithoutYearAndSeconds(scheduleWithExecution.lastExecutionTime))).toBeInTheDocument();
-      expect(screen.getByTitle("Click to view/resume this task in Roo Code")).toBeInTheDocument(); // Check for button
+      expect(screen.getByTitle("Click to view/resume this task in Kilo Code")).toBeInTheDocument(); // Check for button
       expect(screen.queryByText(/Last skipped:/)).not.toBeInTheDocument();
       expect(screen.getByText(/Last executed:/).querySelector('.codicon-clock')).toBeInTheDocument();
     });
@@ -364,7 +466,7 @@ describe("SchedulerView", () => {
       // Find the element containing "Last executed:" and check if it contains the correct date
       const executedElement = screen.getByText(/Last executed:/);
       expect(executedElement.textContent).toContain(formatDateWithoutYearAndSeconds(scheduleWithBoth.lastExecutionTime));
-      expect(screen.queryByTitle("Click to view/resume this task in Roo Code")).not.toBeInTheDocument(); // No button without task ID
+      expect(screen.queryByTitle("Click to view/resume this task in Kilo Code")).not.toBeInTheDocument(); // No button without task ID
       // Find the element containing "Last skipped:" and check if it contains the correct date
       const skippedElement = screen.getByText(/Last skipped:/);
       expect(skippedElement.textContent).toContain(formatDateWithoutYearAndSeconds(scheduleWithBoth.lastSkippedTime));
@@ -389,7 +491,7 @@ describe("SchedulerView", () => {
         expect(screen.getByText(/Last executed:/)).toBeInTheDocument();
       });
       expect(screen.getByText(formatDateWithoutYearAndSeconds(scheduleWithLaterExecution.lastExecutionTime))).toBeInTheDocument();
-      expect(screen.getByTitle("Click to view/resume this task in Roo Code")).toBeInTheDocument(); // Check for button
+      expect(screen.getByTitle("Click to view/resume this task in Kilo Code")).toBeInTheDocument(); // Check for button
       expect(screen.queryByText(/Last skipped:/)).not.toBeInTheDocument();
       expect(screen.getByText(/Last executed:/).querySelector('.codicon-clock')).toBeInTheDocument();
     });
@@ -412,7 +514,7 @@ describe("SchedulerView", () => {
         expect(screen.getByText(/Last skipped:/)).toBeInTheDocument();
       });
       expect(screen.getByText(formatDateWithoutYearAndSeconds(scheduleWithEqualTimes.lastExecutionTime))).toBeInTheDocument();
-      expect(screen.getByTitle("Click to view/resume this task in Roo Code")).toBeInTheDocument(); // Check for button
+      expect(screen.getByTitle("Click to view/resume this task in Kilo Code")).toBeInTheDocument(); // Check for button
       expect(screen.getByText(formatDateWithoutYearAndSeconds(scheduleWithEqualTimes.lastSkippedTime))).toBeInTheDocument();
       expect(screen.getByText(/Last executed:/).querySelector('.codicon-clock')).toBeInTheDocument();
       expect(screen.getByText(/Last skipped:/).querySelector('.codicon-debug-step-back')).toBeInTheDocument();

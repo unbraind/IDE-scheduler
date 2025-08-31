@@ -33,6 +33,7 @@ const vscode = {
 	workspace: {
 		onDidSaveTextDocument: jest.fn(),
 		onDidChangeTextDocument: jest.fn().mockReturnValue({ dispose: jest.fn() }),
+		onDidChangeConfiguration: jest.fn().mockReturnValue({ dispose: jest.fn() }),
 		createFileSystemWatcher: jest.fn().mockReturnValue({
 			onDidCreate: jest.fn().mockReturnValue({ dispose: jest.fn() }),
 			onDidDelete: jest.fn().mockReturnValue({ dispose: jest.fn() }),

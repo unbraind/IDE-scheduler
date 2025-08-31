@@ -36,7 +36,7 @@ type SchedulerViewProps = {
 
 const SchedulerView = ({ onDone }: SchedulerViewProps) => {
 	const { t } = useAppTranslation()
-	const { customModes } = useExtensionState()
+	const { customModes, kiloCodeModes } = useExtensionState()
 	
 	// Add logging for component initialization
 	console.log("SchedulerView component initialized")
@@ -80,8 +80,32 @@ const SchedulerView = ({ onDone }: SchedulerViewProps) => {
 	const [dialogOpen, setDialogOpen] = useState(false)
 	const [scheduleToDelete, setScheduleToDelete] = useState<string | null>(null)
 	
-	// Get all available modes (both default and custom)
-	const availableModes = useMemo(() => getAllModes(customModes), [customModes])
+	// Get all available modes (merge Kilo Code + custom/global + built-ins)
+	const availableModes = useMemo(() => {
+		// Start with modes coming from Kilo Code if present (preserve their order)
+		const fromKilo = Array.isArray(kiloCodeModes) ? kiloCodeModes : []
+		// Fallback/baseline: merge project + global from our state (includes built-ins via getAllModes)
+		const fromCustom = getAllModes(customModes)
+
+		// Build a union by slug, preserving Kilo ordering first
+		const seen = new Set<string>()
+		const merged: typeof fromCustom = []
+
+		for (const m of fromKilo) {
+			if (!seen.has(m.slug)) {
+				seen.add(m.slug)
+				merged.push(m)
+			}
+		}
+		for (const m of fromCustom) {
+			if (!seen.has(m.slug)) {
+				seen.add(m.slug)
+				merged.push(m)
+			}
+		}
+
+		return merged
+	}, [customModes, kiloCodeModes])
 
 	// Ref for ScheduleForm
 	const scheduleFormRef = useRef<ScheduleFormHandle>(null);

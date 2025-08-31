@@ -1,0 +1,39 @@
+{
+  "schedules": [
+    {
+      "id": "1756636979689",
+      "name": "test 1",
+      "mode": "orchestrator",
+      "taskInstructions": "say test and end the conversation",
+      "scheduleType": "time",
+      "timeInterval": "1",
+      "timeUnit": "minute",
+      "selectedDays": {
+        "sun": true,
+        "mon": true,
+        "tue": true,
+        "wed": true,
+        "thu": true,
+        "fri": true,
+        "sat": true
+      },
+      "startDate": "",
+      "startHour": "",
+      "startMinute": "00",
+      "expirationDate": "",
+      "expirationHour": "00",
+      "expirationMinute": "00",
+      "requireActivity": false,
+      "active": false,
+      "taskInteraction": "wait",
+      "inactivityDelay": "1",
+      "lastExecutionTime": "2025-08-31T10:58:01.792Z",
+      "lastSkippedTime": "2025-08-31T10:57:00.515Z",
+      "lastTaskId": "dfa5f236-15b3-4b84-bb82-2d211dc50008",
+      "nextExecutionTime": "2025-08-31T10:59:00.792Z",
+      "modeDisplayName": "Orchestrator",
+      "createdAt": "2025-08-31T10:42:59.689Z",
+      "updatedAt": "2025-08-31T10:56:32.402Z"
+    }
+  ]
+}

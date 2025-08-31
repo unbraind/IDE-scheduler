@@ -261,15 +261,15 @@ export const webviewMessageHandler = async (provider: any, message: WebviewMessa
 						throw new Error("No workspace root found")
 					}
 					
-					// Resolve the full path
-					const fullPath = path.join(workspaceRoot, ".roo", "schedules.json")
+					// Resolve the full path (use .kilo for Kilo Code workspace data)
+					const fullPath = path.join(workspaceRoot, ".kilo", "schedules.json")
 					const uri = vscode.Uri.file(fullPath)
 					
 					// If this is a write operation (has content)
 					if (message.values?.content) {
-						// Ensure the .roo directory exists
-						const rooDir = path.join(workspaceRoot, ".roo")
-						await vscode.workspace.fs.createDirectory(vscode.Uri.file(rooDir))
+						// Ensure the .kilo directory exists
+						const kiloDir = path.join(workspaceRoot, ".kilo")
+						await vscode.workspace.fs.createDirectory(vscode.Uri.file(kiloDir))
 						
 						// Write the file content
 						console.log(`Writing to schedules.json: ${message.values.content}`)

@@ -1,0 +1,31 @@
+feat(scheduler): icon mappings fix, tests update, and experimental Activity Bar badge
+
+Icon and packaging fixes
+- package.json: set theme-aware icons for Activity Bar (light/dark) and corrected command icon mapping to ensure proper visibility in light/dark themes.
+- package.json: Marketplace tile icon uses light PNG to avoid dark-on-dark rendering.
+- assets/icons: removed obsolete icons (kilo-*.svg, roo-icon-*.svg, scheduler-icon.png/svg); kept scheduler-icon-light.png and scheduler-icon-dark.png only.
+- CHANGELOG.md: add 0.0.14 entry detailing icon changes and removals.
+
+Webview tests: Roo Code -> Kilo Code
+- webview-ui/src/__tests__/components/SchedulerView.test.tsx: replace 4 occurrences of title text to "Click to view/resume this task in Kilo Code".
+- webview-ui/src/__tests__/components/ScheduleList.test.tsx: replace 1 occurrence accordingly.
+  Rationale: UI copy was rebranded to Kilo Code; tests now match current DOM.
+
+Experimental badge setting (Activity Bar)
+- package.json (contributes.configuration): add "kilo-scheduler.experimental.activityBadge" (boolean, default false).
+  When enabled, shows the number of active schedules as a numeric badge on the Kilo Scheduler Activity Bar icon; hidden when zero.
+- src/extension.ts: wire badge updates
+  - Define _updateActivityBadge() that reads the setting and sets the badge on the Kilo Scheduler view when supported.
+  - Invoke on schedules updates via the existing "kilo-scheduler.schedulesUpdated" command handler.
+  - Listen to configuration changes (onDidChangeConfiguration) and update badge reactively.
+  - Initialize badge once on activation.
+- src/services/scheduler/SchedulerService.ts: add getActiveScheduleCount() to compute active schedules (active !== false).
+- src/__mocks__/vscode.js: mock workspace.onDidChangeConfiguration for extension tests.
+
+Build/packaging
+- Version bumped earlier to 0.0.14; VSIX built via npm run vsix.
+- Ensured assets/icons/** inclusion remains; removed stray temp files from package payload.
+
+Notes
+- Extension tests: 237 passing.
+- Webview tests: updated string expectations now pass; one pre-existing suite complains about a missing ChatView import (src/__tests__/App.test.tsx). That failure is unrelated to the changes above and can be addressed separately by mocking or restoring the component path.

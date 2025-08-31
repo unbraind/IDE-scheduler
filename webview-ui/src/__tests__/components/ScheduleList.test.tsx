@@ -193,7 +193,7 @@ describe("ScheduleList", () => {
       />
     );
     // The button is rendered only for the first schedule (has lastTaskId and lastExecutionTime)
-    const resumeButton = screen.getByTitle("Click to view/resume this task in Roo Code");
+    const resumeButton = screen.getByTitle("Click to view/resume this task in Kilo Code");
     fireEvent.click(resumeButton);
     expect(onResumeTask).toHaveBeenCalledWith("task-1");
   });

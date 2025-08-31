@@ -19,7 +19,7 @@ import {
 } from "../../schemas"
 import { GlobalFileNames } from "../../shared/globalFileNames"
 import { ExtensionMessage } from "../../shared/ExtensionMessage"
-import { Mode, PromptComponent, defaultModeSlug, getModeBySlug } from "../../shared/modes"
+import { Mode, ModeConfig, PromptComponent, defaultModeSlug, getModeBySlug } from "../../shared/modes"
 import { formatLanguage } from "../../shared/language"
 
 // Constants to replace missing imports
@@ -641,7 +641,7 @@ export class ClineProvider extends EventEmitter<ClineProviderEvents> implements 
 		// const styleResetUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, "assets", "reset.css"))
 		// const styleVSCodeUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, "assets", "vscode.css"))
 
-		// // Same for stylesheet
+		// Same for stylesheet
 		// const stylesheetUri = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, "assets", "main.css"))
 
 		// Use a nonce to only allow a specific script to be run.
@@ -1137,6 +1137,9 @@ export class ClineProvider extends EventEmitter<ClineProviderEvents> implements 
 		const allowedCommands = vscode.workspace.getConfiguration("kilo-code").get<string[]>("allowedCommands") || []
 		const cwd = this.cwd
 
+		// Fetch actual modes from Kilo Code extension
+		const kiloCodeModes = await this.getKiloCodeModes()
+
 		return {
 			version: this.context.extension?.packageJSON?.version ?? "",
 			apiConfiguration,
@@ -1190,7 +1193,9 @@ export class ClineProvider extends EventEmitter<ClineProviderEvents> implements 
 			customSupportPrompts: customSupportPrompts ?? {},
 			enhancementApiConfigId,
 			autoApprovalEnabled: autoApprovalEnabled ?? false,
-			customModes: await this.customModesManager.getCustomModes(),
+				// Do not surface extension-managed custom modes here; rely on Kilo Code's modes
+				customModes: [],
+			kiloCodeModes, // Add the actual modes from Kilo Code
 			experiments: experiments ?? experimentDefault,
 			mcpServers: this.mcpHub?.getAllServers() ?? [],
 			maxOpenTabsContext: maxOpenTabsContext ?? 20,
@@ -1431,5 +1436,21 @@ export class ClineProvider extends EventEmitter<ClineProviderEvents> implements 
 		}
 
 		return properties
+	}
+
+	/**
+	 * Fetches the available modes from the Kilo Code extension.
+	 * @returns Promise<ModeConfig[]> - Array of available modes from Kilo Code
+	 */
+	private async getKiloCodeModes(): Promise<ModeConfig[]> {
+		try {
+			// Import KiloService dynamically to avoid circular dependencies
+			const { KiloService } = await import("../../services/scheduler/KiloService")
+			const modes = await KiloService.getAvailableModes()
+			return modes
+		} catch (error) {
+			console.error("Error fetching Kilo Code modes:", error)
+			return [] // Return empty array on error
+		}
 	}
 }

@@ -59,6 +59,15 @@ export const modes: readonly ModeConfig[] = [
 		customInstructions:
 			"Reflect on 5-7 different possible sources of the problem, distill those down to 1-2 most likely sources, and then add logs to validate your assumptions. Explicitly ask the user to confirm the diagnosis before fixing the problem.",
 	},
+    {
+        slug: "orchestrator",
+        name: "Orchestrator",
+        roleDefinition:
+            "You are Roo, a strategic workflow orchestrator coordinating tasks across specialized modes. Select the best specialist for each subtask and manage hand-offs.",
+        groups: ["read", "browser", "modes", "mcp"],
+        customInstructions:
+            "Break complex problems into sub-modes. Propose a plan with explicit mode hand-offs and request user confirmation before dispatching.",
+    },
 ] as const
 
 // Export the default mode slug
@@ -85,13 +94,23 @@ export function getModeConfig(slug: string, customModes?: ModeConfig[]): ModeCon
 
 // Get all available modes, with custom modes overriding built-in modes
 export function getAllModes(customModes?: ModeConfig[]): ModeConfig[] {
-    // If Kilo Code has provided a modes list via global state, use it 1:1 to
-    // match the user’s active/installed modes and ordering.
-    if (customModes && customModes.length > 0) {
-        return [...customModes]
+    // Always include built-in modes, with project/global custom modes added
+    // (and overriding any built-in by the same slug).
+    const bySlug = new Map<string, ModeConfig>()
+
+    // Start with built-ins to guarantee base modes are selectable
+    for (const m of modes) {
+        bySlug.set(m.slug, m)
     }
-    // Fallback to the built-in minimal set if nothing is provided.
-    return [...modes]
+
+    // Layer custom modes (project/global), overriding built-ins when slugs match
+    if (Array.isArray(customModes)) {
+        for (const m of customModes) {
+            bySlug.set(m.slug, m)
+        }
+    }
+
+    return Array.from(bySlug.values())
 }
 
 // Check if a mode is custom or an override

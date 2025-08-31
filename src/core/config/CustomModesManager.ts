@@ -366,15 +366,20 @@ export class CustomModesManager {
 		}
 	}
 
-	private getGlobalStorageUriPath(): string {
-		let path = this.context.globalStorageUri.fsPath;
-		console.log('Global storage path:', path);
-		if (path) {
-			path = path.replace('globalStorage/kylehoskins.roo-scheduler','globalStorage/kylehoskins.kilo-scheduler');
-			path = path.replace('globalStorage/rooveterinaryinc.roo-cline','globalStorage/kilocode.kilo-code');
-		}	
-		return path;	
-	}
+    private getGlobalStorageUriPath(): string {
+        let path = this.context.globalStorageUri.fsPath;
+        console.log('Global storage path:', path);
+        if (path) {
+            // Migrate any legacy storage dirs to the current publisher/id
+            // - Old Roo Scheduler -> new Kilo Scheduler
+            path = path.replace('globalStorage/kylehoskins.roo-scheduler','globalStorage/unbrained.kilo-scheduler');
+            // - Old interim Kilo Scheduler publisher -> new publisher
+            path = path.replace('globalStorage/kylehoskins.kilo-scheduler','globalStorage/unbrained.kilo-scheduler');
+            // - Old Roo Cline -> Kilo Code storage
+            path = path.replace('globalStorage/rooveterinaryinc.roo-cline','globalStorage/kilocode.kilo-code');
+        }	
+        return path;	 
+    }
 
 	private async ensureSettingsDirectoryExists(): Promise<string> {
 		const settingsDir = path.join(this.getGlobalStorageUriPath(), "settings")

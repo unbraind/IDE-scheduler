@@ -193,6 +193,7 @@ export type ExtensionState = Pick<
 
 	mode: Mode
 	customModes: ModeConfig[]
+	kiloCodeModes: ModeConfig[] // Add the actual modes from Kilo Code extension
 	toolRequirements?: Record<string, boolean> // Map of tool names to their requirements (e.g. {"apply_diff": true} if diffEnabled)
 
 	cwd?: string // Current working directory
