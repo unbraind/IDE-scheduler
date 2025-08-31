@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.0.16] - 2025-08-31
+
+### Added
+- MCP HTTP endpoint (experimental) based on Model Context Protocol SDK:
+  - New settings: `agent-scheduler.experimental.mcp.http.enabled`, `.mcp.http.port` (default 4025), `.mcp.http.path` (default `/mcp`).
+  - New server at `http://127.0.0.1:<port><path>` with tool `a2a.invoke` that validates input and forwards to the internal A2A handler.
+  - Activation now starts the MCP endpoint when enabled; deactivation gracefully stops it.
+- Agent command discovery command:
+  - New command: `agent-scheduler.mapAgentCommands` to discover installed agent extensions, infer trigger/list commands, persist them to settings, and display a summary.
+- Expanded agent configuration and wiring:
+  - Added trigger/list command overrides for Roo Code, Continue, Cursor, Claude Code, Gemini CLI, Qwen Coder CLI; optional support flags for Copilot and Amazon Q.
+  - Broadened discovery heuristics (ids, names, keywords) to match more agents.
+
+### Changed
+- Bumped version to `0.0.16`.
+- Activation now starts MCP endpoint in addition to the existing gRPC server when enabled via settings.
+
+### Notes
+- The MCP server uses the official `McpServer` + `StreamableHTTPServerTransport` and exposes a single tool for now; this keeps the surface area minimal while enabling other MCP-savvy agents to call into the scheduler.
+
 ## [0.0.15] - 2025-08-31
 
 ### Added

@@ -3,7 +3,7 @@
 	"displayName": "Kilo Scheduler",
 	"description": "A task scheduler for Kilo Code",
 	"publisher": "unbrained",
-	"version": "0.0.15",
+	"version": "0.0.16",
 	"icon": "assets/icons/scheduler-icon-light.png",
 	"galleryBanner": {
 		"color": "#617A91",
@@ -62,186 +62,399 @@
 				"kilo-scheduler.experimental.activityBadge": {
 					"type": "boolean",
 					"default": false,
-					"description": "Experimental: show the number of active schedules as a badge on the Kilo Scheduler Activity Bar icon."
-				,
-				"kilo-scheduler.experimental.crossIde": {
-					"type": "boolean",
-					"default": false,
-					"description": "Experimental (WIP): Enable cross-IDE scheduling interface + Agent-to-Agent trigger support. Very early WIP (cline, roo-code, Continue, Cursor, Claude Code, Gemini CLI, Qwen Coder CLI)."
-				},
-				"kilo-scheduler.experimental.agents.kilocode.enabled": {
-					"type": "boolean",
-					"default": true,
-					"description": "Enable Kilo Code adapter (experimental cross-IDE)."
-				},
-				"kilo-scheduler.experimental.agents.kilocode.allowedActions": {
-					"type": "array",
-					"description": "Allowed A2A actions for Kilo Code adapter.",
-					"items": { "type": "string", "enum": ["trigger", "list", "setActive"] },
-					"default": ["trigger", "list", "setActive"]
-				},
-				"kilo-scheduler.experimental.agents.cline.enabled": {
-					"type": "boolean",
-					"default": false,
-					"description": "Enable Cline adapter (experimental cross-IDE)."
-				},
-				"kilo-scheduler.experimental.agents.cline.allowedActions": {
-					"type": "array",
-					"description": "Allowed A2A actions for Cline adapter.",
-					"items": { "type": "string", "enum": ["trigger", "list", "setActive"] },
-					"default": ["trigger"]
-				},
-				"kilo-scheduler.experimental.agents.rooCode.enabled": {
-					"type": "boolean",
-					"default": false,
-					"description": "Enable Roo Code adapter (experimental cross-IDE)."
-				},
-				"kilo-scheduler.experimental.agents.rooCode.allowedActions": {
-					"type": "array",
-					"description": "Allowed A2A actions for Roo Code adapter.",
-					"items": { "type": "string", "enum": ["trigger", "list", "setActive"] },
-					"default": ["trigger"]
-				},
-				"kilo-scheduler.experimental.agents.continue.enabled": {
-					"type": "boolean",
-					"default": false,
-					"description": "Enable Continue adapter (experimental cross-IDE)."
-				},
-				"kilo-scheduler.experimental.agents.continue.allowedActions": {
-					"type": "array",
-					"description": "Allowed A2A actions for Continue adapter.",
-					"items": { "type": "string", "enum": ["trigger", "list", "setActive"] },
-					"default": ["trigger"]
-				},
-				"kilo-scheduler.experimental.agents.cursor.enabled": {
-					"type": "boolean",
-					"default": false,
-					"description": "Enable Cursor adapter (experimental cross-IDE)."
-				},
-				"kilo-scheduler.experimental.agents.cursor.allowedActions": {
-					"type": "array",
-					"description": "Allowed A2A actions for Cursor adapter.",
-					"items": { "type": "string", "enum": ["trigger", "list", "setActive"] },
-					"default": ["trigger"]
-				},
-				"kilo-scheduler.experimental.agents.claudeCode.enabled": {
-					"type": "boolean",
-					"default": false,
-					"description": "Enable Claude Code adapter (experimental cross-IDE)."
-				},
-				"kilo-scheduler.experimental.agents.claudeCode.allowedActions": {
-					"type": "array",
-					"description": "Allowed A2A actions for Claude Code adapter.",
-					"items": { "type": "string", "enum": ["trigger", "list", "setActive"] },
-					"default": ["trigger"]
-				},
-				"kilo-scheduler.experimental.agents.geminiCli.enabled": {
-					"type": "boolean",
-					"default": false,
-					"description": "Enable Google Gemini CLI adapter (experimental cross-IDE)."
-				},
-				"kilo-scheduler.experimental.agents.geminiCli.allowedActions": {
-					"type": "array",
-					"description": "Allowed A2A actions for Gemini CLI adapter.",
-					"items": { "type": "string", "enum": ["trigger", "list", "setActive"] },
-					"default": ["trigger"]
-				},
-				"kilo-scheduler.experimental.agents.qwenCli.enabled": {
-					"type": "boolean",
-					"default": false,
-					"description": "Enable Qwen Coder CLI adapter (experimental cross-IDE)."
-				},
-				"kilo-scheduler.experimental.agents.qwenCli.allowedActions": {
-					"type": "array",
-					"description": "Allowed A2A actions for Qwen CLI adapter.",
-					"items": { "type": "string", "enum": ["trigger", "list", "setActive"] },
-					"default": ["trigger"]
-				},
-
-				"agent-scheduler.experimental.activityBadge": {
-					"type": "boolean",
-					"default": false,
-					"description": "Experimental: show the number of active schedules as a badge on the Agent Scheduler Activity Bar icon."
-				},
-				"agent-scheduler.experimental.crossIde": {
-					"type": "boolean",
-					"default": false,
-					"description": "Experimental (WIP): Enable cross-IDE scheduling interface + Agent-to-Agent trigger support."
-				},
-				"agent-scheduler.experimental.mcp.enabled": {
-					"type": "boolean",
-					"default": false,
-					"description": "Enable MCP integration for forwarding/receiving A2A messages (experimental)."
-				},
-				"agent-scheduler.experimental.mcp.forward": {
-					"type": "boolean",
-					"default": false,
-					"description": "Forward A2A trigger messages over MCP when enabled."
-				},
-				"agent-scheduler.experimental.mcp.endpoint": {
-					"type": "string",
-					"default": "",
-					"description": "MCP endpoint to send A2A messages to (SDK-dependent)."
-				},
-				"agent-scheduler.experimental.grpc.enabled": {
-					"type": "boolean",
-					"default": false,
-					"description": "Enable built-in A2A gRPC server (experimental)."
-				},
-				"agent-scheduler.experimental.grpc.host": {
-					"type": "string",
-					"default": "127.0.0.1",
-					"description": "Host/interface on which to bind the A2A gRPC server."
-				},
-				"agent-scheduler.experimental.grpc.port": {
-					"type": "number",
-					"default": 50251,
-					"description": "Port on which to bind the A2A gRPC server."
-				},
-				"agent-scheduler.experimental.grpc.client.enabled": {
-					"type": "boolean",
-					"default": false,
-					"description": "Enable A2A gRPC client for outbound messages."
-				},
-				"agent-scheduler.experimental.grpc.client.target": {
-					"type": "string",
-					"default": "127.0.0.1:50251",
-					"description": "Target host:port of remote A2A gRPC server."
-				},
-				"agent-scheduler.experimental.agents.kilocode.enabled": {
-					"type": "boolean",
-					"default": true,
-					"description": "Enable Kilo Code adapter (experimental cross-IDE)."
-				},
-				"agent-scheduler.experimental.agents.kilocode.allowedActions": {
-					"type": "array",
-					"description": "Allowed A2A actions for Kilo Code adapter.",
-					"items": { "type": "string", "enum": ["trigger", "list", "setActive"] },
-					"default": ["trigger", "list", "setActive"]
-				},
-				"agent-scheduler.experimental.agents.cline.enabled": {
-					"type": "boolean",
-					"default": false,
-					"description": "Enable Cline adapter (experimental cross-IDE)."
-				},
-				"agent-scheduler.experimental.agents.cline.allowedActions": {
-					"type": "array",
-					"description": "Allowed A2A actions for Cline adapter.",
-					"items": { "type": "string", "enum": ["trigger", "list", "setActive"] },
-					"default": ["trigger"]
-				},
-				"agent-scheduler.experimental.agents.cline.triggerCommand": {
-					"type": "string",
-					"default": "cline.newTask",
-					"description": "Override command id to trigger Cline (auto-discovered when possible)."
-				},
-				"agent-scheduler.experimental.agents.cline.listCommand": {
-					"type": "string",
-					"default": "",
-					"description": "Optional command id to list Cline schedules/tasks (if provided by the extension)."
+					"description": "Experimental: show the number of active schedules as a badge on the Kilo Scheduler Activity Bar icon.",
+					"kilo-scheduler.experimental.crossIde": {
+						"type": "boolean",
+						"default": false,
+						"description": "Experimental (WIP): Enable cross-IDE scheduling interface + Agent-to-Agent trigger support. Very early WIP (cline, roo-code, Continue, Cursor, Claude Code, Gemini CLI, Qwen Coder CLI)."
+					},
+					"kilo-scheduler.experimental.agents.kilocode.enabled": {
+						"type": "boolean",
+						"default": true,
+						"description": "Enable Kilo Code adapter (experimental cross-IDE)."
+					},
+					"kilo-scheduler.experimental.agents.kilocode.allowedActions": {
+						"type": "array",
+						"description": "Allowed A2A actions for Kilo Code adapter.",
+						"items": {
+							"type": "string",
+							"enum": [
+								"trigger",
+								"list",
+								"setActive"
+							]
+						},
+						"default": [
+							"trigger",
+							"list",
+							"setActive"
+						]
+					},
+					"kilo-scheduler.experimental.agents.cline.enabled": {
+						"type": "boolean",
+						"default": false,
+						"description": "Enable Cline adapter (experimental cross-IDE)."
+					},
+					"kilo-scheduler.experimental.agents.cline.allowedActions": {
+						"type": "array",
+						"description": "Allowed A2A actions for Cline adapter.",
+						"items": {
+							"type": "string",
+							"enum": [
+								"trigger",
+								"list",
+								"setActive"
+							]
+						},
+						"default": [
+							"trigger"
+						]
+					},
+					"kilo-scheduler.experimental.agents.rooCode.enabled": {
+						"type": "boolean",
+						"default": false,
+						"description": "Enable Roo Code adapter (experimental cross-IDE)."
+					},
+					"kilo-scheduler.experimental.agents.rooCode.allowedActions": {
+						"type": "array",
+						"description": "Allowed A2A actions for Roo Code adapter.",
+						"items": {
+							"type": "string",
+							"enum": [
+								"trigger",
+								"list",
+								"setActive"
+							]
+						},
+						"default": [
+							"trigger"
+						]
+					},
+					"kilo-scheduler.experimental.agents.continue.enabled": {
+						"type": "boolean",
+						"default": false,
+						"description": "Enable Continue adapter (experimental cross-IDE)."
+					},
+					"kilo-scheduler.experimental.agents.continue.allowedActions": {
+						"type": "array",
+						"description": "Allowed A2A actions for Continue adapter.",
+						"items": {
+							"type": "string",
+							"enum": [
+								"trigger",
+								"list",
+								"setActive"
+							]
+						},
+						"default": [
+							"trigger"
+						]
+					},
+					"kilo-scheduler.experimental.agents.cursor.enabled": {
+						"type": "boolean",
+						"default": false,
+						"description": "Enable Cursor adapter (experimental cross-IDE)."
+					},
+					"kilo-scheduler.experimental.agents.cursor.allowedActions": {
+						"type": "array",
+						"description": "Allowed A2A actions for Cursor adapter.",
+						"items": {
+							"type": "string",
+							"enum": [
+								"trigger",
+								"list",
+								"setActive"
+							]
+						},
+						"default": [
+							"trigger"
+						]
+					},
+					"kilo-scheduler.experimental.agents.claudeCode.enabled": {
+						"type": "boolean",
+						"default": false,
+						"description": "Enable Claude Code adapter (experimental cross-IDE)."
+					},
+					"kilo-scheduler.experimental.agents.claudeCode.allowedActions": {
+						"type": "array",
+						"description": "Allowed A2A actions for Claude Code adapter.",
+						"items": {
+							"type": "string",
+							"enum": [
+								"trigger",
+								"list",
+								"setActive"
+							]
+						},
+						"default": [
+							"trigger"
+						]
+					},
+					"kilo-scheduler.experimental.agents.geminiCli.enabled": {
+						"type": "boolean",
+						"default": false,
+						"description": "Enable Google Gemini CLI adapter (experimental cross-IDE)."
+					},
+					"kilo-scheduler.experimental.agents.geminiCli.allowedActions": {
+						"type": "array",
+						"description": "Allowed A2A actions for Gemini CLI adapter.",
+						"items": {
+							"type": "string",
+							"enum": [
+								"trigger",
+								"list",
+								"setActive"
+							]
+						},
+						"default": [
+							"trigger"
+						]
+					},
+					"kilo-scheduler.experimental.agents.qwenCli.enabled": {
+						"type": "boolean",
+						"default": false,
+						"description": "Enable Qwen Coder CLI adapter (experimental cross-IDE)."
+					},
+					"kilo-scheduler.experimental.agents.qwenCli.allowedActions": {
+						"type": "array",
+						"description": "Allowed A2A actions for Qwen CLI adapter.",
+						"items": {
+							"type": "string",
+							"enum": [
+								"trigger",
+								"list",
+								"setActive"
+							]
+						},
+						"default": [
+							"trigger"
+						]
+					},
+					"agent-scheduler.experimental.activityBadge": {
+						"type": "boolean",
+						"default": false,
+						"description": "Experimental: show the number of active schedules as a badge on the Agent Scheduler Activity Bar icon."
+					},
+					"agent-scheduler.experimental.crossIde": {
+						"type": "boolean",
+						"default": false,
+						"description": "Experimental (WIP): Enable cross-IDE scheduling interface + Agent-to-Agent trigger support."
+					},
+					"agent-scheduler.experimental.mcp.enabled": {
+						"type": "boolean",
+						"default": false,
+						"description": "Enable MCP integration for forwarding/receiving A2A messages (experimental)."
+					},
+					"agent-scheduler.experimental.mcp.forward": {
+						"type": "boolean",
+						"default": false,
+						"description": "Forward A2A trigger messages over MCP when enabled."
+					},
+					"agent-scheduler.experimental.mcp.endpoint": {
+						"type": "string",
+						"default": "",
+						"description": "MCP endpoint to send A2A messages to (SDK-dependent)."
+					},
+					"agent-scheduler.experimental.mcp.http.enabled": {
+						"type": "boolean",
+						"default": false,
+						"description": "Start a local MCP HTTP endpoint for tools (experimental)."
+					},
+					"agent-scheduler.experimental.mcp.http.port": {
+						"type": "number",
+						"default": 4025,
+						"description": "Port for the local MCP HTTP endpoint."
+					},
+					"agent-scheduler.experimental.mcp.http.path": {
+						"type": "string",
+						"default": "/mcp",
+						"description": "Base path for the MCP HTTP endpoint."
+					},
+					"agent-scheduler.experimental.grpc.enabled": {
+						"type": "boolean",
+						"default": false,
+						"description": "Enable built-in A2A gRPC server (experimental)."
+					},
+					"agent-scheduler.experimental.grpc.host": {
+						"type": "string",
+						"default": "127.0.0.1",
+						"description": "Host/interface on which to bind the A2A gRPC server."
+					},
+					"agent-scheduler.experimental.grpc.port": {
+						"type": "number",
+						"default": 50251,
+						"description": "Port on which to bind the A2A gRPC server."
+					},
+					"agent-scheduler.experimental.grpc.client.enabled": {
+						"type": "boolean",
+						"default": false,
+						"description": "Enable A2A gRPC client for outbound messages."
+					},
+					"agent-scheduler.experimental.grpc.client.target": {
+						"type": "string",
+						"default": "127.0.0.1:50251",
+						"description": "Target host:port of remote A2A gRPC server."
+					},
+					"agent-scheduler.experimental.agents.kilocode.enabled": {
+						"type": "boolean",
+						"default": true,
+						"description": "Enable Kilo Code adapter (experimental cross-IDE)."
+					},
+					"agent-scheduler.experimental.agents.kilocode.allowedActions": {
+						"type": "array",
+						"description": "Allowed A2A actions for Kilo Code adapter.",
+						"items": {
+							"type": "string",
+							"enum": [
+								"trigger",
+								"list",
+								"setActive"
+							]
+						},
+						"default": [
+							"trigger",
+							"list",
+							"setActive"
+						]
+					},
+					"agent-scheduler.experimental.agents.cline.enabled": {
+						"type": "boolean",
+						"default": false,
+						"description": "Enable Cline adapter (experimental cross-IDE)."
+					},
+					"agent-scheduler.experimental.agents.cline.allowedActions": {
+						"type": "array",
+						"description": "Allowed A2A actions for Cline adapter.",
+						"items": {
+							"type": "string",
+							"enum": [
+								"trigger",
+								"list",
+								"setActive"
+							]
+						},
+						"default": [
+							"trigger"
+						]
+					},
+					"agent-scheduler.experimental.agents.cline.triggerCommand": {
+						"type": "string",
+						"default": "cline.newTask",
+						"description": "Override command id to trigger Cline (auto-discovered when possible)."
+					},
+					"agent-scheduler.experimental.agents.cline.listCommand": {
+						"type": "string",
+						"default": "",
+						"description": "Optional command id to list Cline schedules/tasks (if provided by the extension)."
+					},
+					"agent-scheduler.experimental.agents.rooCode.triggerCommand": {
+						"type": "string",
+						"default": "",
+						"description": "Override command id to trigger Roo Code (auto-discovered when possible)."
+					},
+					"agent-scheduler.experimental.agents.rooCode.listCommand": {
+						"type": "string",
+						"default": "",
+						"description": "Optional command id to list Roo Code schedules/tasks."
+					},
+					"agent-scheduler.experimental.agents.continue.triggerCommand": {
+						"type": "string",
+						"default": "",
+						"description": "Override command id to trigger Continue."
+					},
+					"agent-scheduler.experimental.agents.continue.listCommand": {
+						"type": "string",
+						"default": "",
+						"description": "Optional command id to list Continue tasks/history."
+					},
+					"agent-scheduler.experimental.agents.cursor.triggerCommand": {
+						"type": "string",
+						"default": "",
+						"description": "Override command id to trigger Cursor."
+					},
+					"agent-scheduler.experimental.agents.cursor.listCommand": {
+						"type": "string",
+						"default": "",
+						"description": "Optional command id to list Cursor tasks/history."
+					},
+					"agent-scheduler.experimental.agents.claudeCode.triggerCommand": {
+						"type": "string",
+						"default": "",
+						"description": "Override command id to trigger Claude Code."
+					},
+					"agent-scheduler.experimental.agents.claudeCode.listCommand": {
+						"type": "string",
+						"default": "",
+						"description": "Optional command id to list Claude Code tasks/history."
+					},
+					"agent-scheduler.experimental.agents.geminiCli.triggerCommand": {
+						"type": "string",
+						"default": "",
+						"description": "Override command id to trigger Google Gemini CLI."
+					},
+					"agent-scheduler.experimental.agents.geminiCli.listCommand": {
+						"type": "string",
+						"default": "",
+						"description": "Optional command id to list Gemini CLI tasks/history."
+					},
+					"agent-scheduler.experimental.agents.qwenCli.triggerCommand": {
+						"type": "string",
+						"default": "",
+						"description": "Override command id to trigger Qwen Coder CLI."
+					},
+					"agent-scheduler.experimental.agents.qwenCli.listCommand": {
+						"type": "string",
+						"default": "",
+						"description": "Optional command id to list Qwen Coder CLI tasks/history."
+					},
+					"agent-scheduler.experimental.agents.copilot.enabled": {
+						"type": "boolean",
+						"default": false,
+						"description": "Enable GitHub Copilot adapter (experimental cross-IDE)."
+					},
+					"agent-scheduler.experimental.agents.copilot.allowedActions": {
+						"type": "array",
+						"items": {
+							"type": "string",
+							"enum": [
+								"trigger",
+								"list"
+							]
+						},
+						"default": [
+							"trigger"
+						]
+					},
+					"agent-scheduler.experimental.agents.copilot.triggerCommand": {
+						"type": "string",
+						"default": "",
+						"description": "Override command id to trigger Copilot (e.g., open chat)."
+					},
+					"agent-scheduler.experimental.agents.amazonQ.enabled": {
+						"type": "boolean",
+						"default": false,
+						"description": "Enable Amazon Q adapter (experimental cross-IDE)."
+					},
+					"agent-scheduler.experimental.agents.amazonQ.allowedActions": {
+						"type": "array",
+						"items": {
+							"type": "string",
+							"enum": [
+								"trigger",
+								"list"
+							]
+						},
+						"default": [
+							"trigger"
+						]
+					},
+					"agent-scheduler.experimental.agents.amazonQ.triggerCommand": {
+						"type": "string",
+						"default": "",
+						"description": "Override command id to trigger Amazon Q."
+					}
 				}
 			}
-		}
 		},
 		"viewsContainers": {
 			"activitybar": [
@@ -292,6 +505,11 @@
 			{
 				"command": "agent-scheduler.grpc.invoke",
 				"title": "AgentScheduler: gRPC A2A Invoke (Experimental)",
+				"category": "Agent Scheduler"
+			},
+			{
+				"command": "agent-scheduler.mapAgentCommands",
+				"title": "AgentScheduler: Map Agent Commands (Discover & Persist)",
 				"category": "Agent Scheduler"
 			}
 		],
@@ -366,10 +584,10 @@
 		"@genkit-ai/mcp": "^1.18.0",
 		"@google-cloud/vertexai": "^1.9.3",
 		"@google/generative-ai": "^0.18.0",
-		"@mistralai/mistralai": "^1.3.6",
-		"@modelcontextprotocol/sdk": "^1.7.0",
 		"@grpc/grpc-js": "^1.11.3",
 		"@grpc/proto-loader": "^0.7.13",
+		"@mistralai/mistralai": "^1.3.6",
+		"@modelcontextprotocol/sdk": "^1.7.0",
 		"@types/clone-deep": "^4.0.4",
 		"@types/pdf-parse": "^1.1.4",
 		"@types/tmp": "^0.2.6",

@@ -23,10 +23,12 @@ import { migrateSettings } from "./utils/migrateSettings"
 import { formatLanguage } from "./shared/language"
 import { ClineProvider } from "./core/webview/ClineProvider"
 import { SchedulerAdapterRegistry } from "./services/scheduler/adapters"
+import { discoverAgentCommands, persistDiscoveredAgentCommands } from './services/scheduler/AgentCommandMapper'
 import { startA2AGrpcServer } from './protocols/grpc/server'
 import { invokeA2A } from './protocols/grpc/client'
 import { getSetting } from './utils/config'
 import { handleA2ATrigger } from "./protocols/a2a"
+import { startMcpA2AEndpoint, stopMcpA2AEndpoint } from './integrations/mcp/server'
 /**
  * Built using https://github.com/microsoft/vscode-webview-ui-toolkit
  *
@@ -91,6 +93,20 @@ export async function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand("agent-scheduler.openAgentScheduler", async () => {
             try { await vscode.commands.executeCommand("agent-scheduler.SidebarProvider.focus") } catch {}
             try { await vscode.commands.executeCommand("kilo-code.SidebarProvider.focus") } catch {}
+		})
+	)
+
+	// Command to discover and persist agent commands in settings
+	context.subscriptions.push(
+		vscode.commands.registerCommand('agent-scheduler.mapAgentCommands', async () => {
+			try {
+				const discovered = await discoverAgentCommands()
+				await persistDiscoveredAgentCommands(discovered)
+				const lines = discovered.map(d => `${d.agent}: ${d.extensionId ?? 'n/a'} | trigger=${d.triggerCommand ?? '-'} | list=${d.listCommand ?? '-'}`)
+				vscode.window.showInformationMessage(`Mapped agent commands:\n${lines.join('\n')}`, { modal: true })
+			} catch (e:any) {
+				vscode.window.showErrorMessage(`Agent command mapping failed: ${e?.message || e}`)
+			}
 		})
 	)
 
@@ -220,6 +236,9 @@ export async function activate(context: vscode.ExtensionContext) {
 	// Start experimental A2A gRPC server if enabled
 	try { await startA2AGrpcServer(context) } catch {}
 
+	// Start MCP HTTP endpoint if enabled (experimental)
+	try { await startMcpA2AEndpoint(context) } catch {}
+
 	// Optional: dev helper to invoke remote A2A via gRPC client
 	context.subscriptions.push(
 		vscode.commands.registerCommand('agent-scheduler.grpc.invoke', async () => {
@@ -240,7 +259,7 @@ export async function activate(context: vscode.ExtensionContext) {
 export async function deactivate() {
     outputChannel.appendLine("Kilo-Code extension deactivated")
 	// Clean up MCP server manager
-	
+	try { stopMcpA2AEndpoint() } catch {}
 	// The scheduler service will be automatically cleaned up when the extension is deactivated
 	// as its timers are registered as disposables in the extension context
 }

@@ -1,0 +1,76 @@
+feat(a2a+grpc+mcp+rename): AgentScheduler contributes, dynamic agent mapping, gRPC A2A server/client, MCP endpoint scaffold, and build/test updates
+
+Summary
+- Migrates contributes IDs to AgentScheduler (kept legacy settings readable)
+- Adds dynamic agent command discovery + settings wiring
+- Implements experimental A2A gRPC server and client (proto included)
+- Scaffolds an MCP endpoint for inbound A2A (feature-flagged)
+- Updates code to prefer AgentScheduler IDs and gracefully fallback to legacy
+- Bumps version to 0.0.15; updates changelog; rebuilds VSIX
+
+Details
+1) Contributes/Commands rename to AgentScheduler
+- package.json:
+  - configuration title -> "Agent Scheduler"
+  - new views container id `agent-scheduler-ActivityBar` and view id `agent-scheduler.SidebarProvider`
+  - commands: `agent-scheduler.reloadWindowDev`, `agent-scheduler.openAgentScheduler`, `agent-scheduler.a2a.trigger`, `agent-scheduler.a2a.sample`, `agent-scheduler.grpc.invoke`
+  - menus updated to target the new view id
+- src/core/webview/ClineProvider.ts:
+  - Updated static ids to AgentScheduler; focus new view with fallback to legacy
+- src/extension.ts:
+  - Registers renamed commands; schedulesUpdated renamed to `agent-scheduler.schedulesUpdated`
+  - Focus/open logic prefers new ids, falls back when needed
+  - Activity badge now reads AgentScheduler settings via unified config util
+
+2) Settings and unified config helper
+- package.json:
+  - AgentScheduler settings added alongside existing kilo-scheduler.* for transition:
+    - `agent-scheduler.experimental.activityBadge`, `...crossIde`
+    - MCP: `...mcp.enabled`, `...mcp.forward`, `...mcp.endpoint`
+    - gRPC: `...grpc.enabled`, `...grpc.host`, `...grpc.port`, `...grpc.client.enabled`, `...grpc.client.target`
+    - Per-agent (cline shown): `...agents.cline.triggerCommand`, `.listCommand`; enabled/allowedActions mirrored for all
+- src/utils/config.ts:
+  - getSetting/getConfig helpers prefer AgentScheduler keys, fallback to legacy kilo-scheduler keys for compatibility
+- src/protocols/a2a.ts and src/integrations/mcp/bridge.ts now read settings via getSetting()
+
+3) Dynamic agent command mapping
+- src/services/scheduler/AgentCommandMapper.ts:
+  - Scans installed extensions to heuristically find trigger/list commands for known agents (cline, roo-code, continue, cursor, claude, gemini, qwen)
+  - On registry init, writes discovered commands to settings only when unset
+- src/services/scheduler/adapters/index.ts:
+  - Uses AgentScheduler settings; runs discovery after adapter initialization
+- src/services/scheduler/adapters/ClineAdapter.ts:
+  - Reads trigger/list commands from AgentScheduler settings
+
+4) A2A gRPC server + client (experimental)
+- Dependencies: @grpc/grpc-js, @grpc/proto-loader
+- Proto: src/protocols/grpc/a2a.proto (a2a.v1.A2AService Invoke)
+- Server: src/protocols/grpc/server.ts
+  - Loads proto at runtime, binds to configurable host/port
+  - Maps Invoke to existing handleA2ATrigger; returns {ok,error,data}
+- Client: src/protocols/grpc/client.ts
+  - Sends Invoke to configured target for outbound A2A
+- esbuild.js: copies .proto files to `dist/protocols/grpc` to enable runtime loading
+- src/extension.ts: starts server when enabled; adds `agent-scheduler.grpc.invoke` command for manual testing
+
+5) MCP endpoint scaffold
+- src/integrations/mcp/server.ts:
+  - Minimal, feature-flagged; attempts to expose `a2a.invoke` tool via SDK when available; routes to handleA2ATrigger
+- src/integrations/mcp/bridge.ts: forwards when enabled using new AgentScheduler settings
+
+6) Fallbacks + compatibility
+- src/services/scheduler/SchedulerService.ts: emits `agent-scheduler.schedulesUpdated` with legacy fallback
+- src/core/webview/webviewMessageHandler.ts & KiloCodeAdapter.ts: route `handleHumanRelayResponse` to new id with legacy fallback
+
+7) Changelog + version
+- CHANGELOG.md: adds 0.0.15 entry summarizing contributes rename, gRPC/MCP scaffolding, settings, and mapper
+- package.json: version bumped to 0.0.15
+
+8) Build & Tests
+- npm ci; compile + esbuild succeeds; proto copied
+- Unit tests: 245 passing for extension; 57 passing for webview (no new failures)
+- VSIX built: bin/kilo-scheduler-0.0.15.vsix
+
+Notes on A2A/MCP
+- A2A gRPC implementation is intentionally minimal and adheres to a message-first, single Invoke RPC (aligned with existing TS A2A handler). As protocol specs stabilize, we can split RPCs (Trigger/List/SetActive) and harden schemas.
+- MCP endpoint is a guarded scaffold: avoids hard-coding transports until latest Model Context Protocol server guidance is finalized. The bridge forwards only when explicitly enabled and configured.

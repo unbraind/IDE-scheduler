@@ -10,5 +10,7 @@
 	},
 	// Turn off tsc task auto detection since we have the necessary tasks as npm scripts
 	"typescript.tsc.autoDetect": "off",
-	"codium.codeCompletion.enable": false
+	"codium.codeCompletion.enable": false,
+	"claudeCodeChat.permissions.yoloMode": true,
+	"chatgpt.openOnStartup": true
 }
