@@ -4,7 +4,7 @@ import { SchedulerAdapterRegistry } from '../services/scheduler/adapters'
 import { sendA2AOverMCP } from '../integrations/mcp/bridge'
 
 // Minimal A2A (Agent-to-Agent) message shape for experimental use
-export type A2AAction = 'trigger' | 'list' | 'setActive'
+export type A2AAction = 'trigger' | 'list' | 'setActive' | 'message' | 'task.create' | 'task.get' | 'task.list' | 'task.cancel'
 
 export interface A2AMessage {
   protocol: 'a2a'
@@ -19,6 +19,12 @@ export interface A2AMessage {
     // setActive
     scheduleId?: string
     active?: boolean
+    // message
+    channel?: string
+    text?: string
+    // tasks
+    id?: string
+    title?: string
     // extensibility bag
     [k: string]: unknown
   }
@@ -35,7 +41,10 @@ export function validateA2AMessage(input: any): { valid: boolean; errors: string
     if (!input.action || typeof input.action !== 'string' || !input.action.trim()) {
       errors.push('action is required')
     } else if (!['trigger','list','setActive'].includes(input.action)) {
-      errors.push('action must be one of: trigger, list, setActive')
+      const allowed = ['trigger','list','setActive','message','task.create','task.get','task.list','task.cancel']
+      if (!(allowed as string[]).includes(input.action)) {
+        errors.push('action must be one of: ' + allowed.join(', '))
+      }
     }
     if (input.payload && typeof input.payload !== 'object') errors.push('payload must be an object if provided')
 
@@ -103,4 +112,68 @@ export async function handleA2ATrigger(msg: A2AMessage | any): Promise<any> {
     return { ok: true }
   }
   return { ok: false, error: 'unsupported' }
+}
+
+function isActionAllowed(adapterId: string, action: A2AAction): boolean {
+  const cfg = vscode.workspace.getConfiguration('agent-scheduler')
+  const key = configKeyForAdapter(adapterId)
+  const configured = cfg.get<string[]>(`experimental.agents.${key}.allowedActions`)
+  const def = adapterId === 'kilocode' ? ['trigger','list','setActive','message','task.create','task.get','task.list','task.cancel'] : ['trigger']
+  const allowed = (Array.isArray(configured) && configured.length > 0) ? configured : def
+  return allowed.includes(action)
+}
+
+export async function handleSendMessage(args: { agent: string; channel?: string; text?: string; metadata?: any }): Promise<any> {
+  const registry = SchedulerAdapterRegistry.instance()
+  await registry.initialize((global as any).__extensionContext || ({} as vscode.ExtensionContext))
+  const adapter = registry.get(args.agent.toLowerCase()) || registry.get('kilocode')
+  if (!adapter) return { ok: false, error: 'no-adapter' }
+  if (!isActionAllowed(adapter.id, 'message')) return { ok: false, error: 'action-not-allowed' }
+  if (!adapter.sendMessage) return { ok: false, error: 'not-implemented' }
+  const res = await adapter.sendMessage({ channel: args.channel, text: String(args.text || ''), metadata: args.metadata })
+  return { ok: !!res?.ok, error: (res as any)?.error, data: (res as any)?.data }
+}
+
+export async function handleCreateTask(args: { agent: string; title?: string; params?: any }) {
+  const registry = SchedulerAdapterRegistry.instance()
+  await registry.initialize((global as any).__extensionContext || ({} as vscode.ExtensionContext))
+  const adapter = registry.get(args.agent.toLowerCase()) || registry.get('kilocode')
+  if (!adapter) return { ok: false, error: 'no-adapter' }
+  if (!isActionAllowed(adapter.id, 'task.create')) return { ok: false, error: 'action-not-allowed' }
+  if (!adapter.createTask) return { ok: false, error: 'not-implemented' }
+  const res = await adapter.createTask({ title: args.title, params: args.params })
+  return { ok: !!res?.ok, error: (res as any)?.error, task: (res as any)?.task }
+}
+
+export async function handleGetTask(args: { agent: string; id: string }) {
+  const registry = SchedulerAdapterRegistry.instance()
+  await registry.initialize((global as any).__extensionContext || ({} as vscode.ExtensionContext))
+  const adapter = registry.get(args.agent.toLowerCase()) || registry.get('kilocode')
+  if (!adapter) return { ok: false, error: 'no-adapter' }
+  if (!isActionAllowed(adapter.id, 'task.get')) return { ok: false, error: 'action-not-allowed' }
+  if (!adapter.getTask) return { ok: false, error: 'not-implemented' }
+  const res = await adapter.getTask(args.id)
+  return { ok: !!res?.ok, error: (res as any)?.error, task: (res as any)?.task }
+}
+
+export async function handleListTasks(args: { agent: string; filter?: string; options?: any }) {
+  const registry = SchedulerAdapterRegistry.instance()
+  await registry.initialize((global as any).__extensionContext || ({} as vscode.ExtensionContext))
+  const adapter = registry.get(args.agent.toLowerCase()) || registry.get('kilocode')
+  if (!adapter) return { ok: false, error: 'no-adapter' }
+  if (!isActionAllowed(adapter.id, 'task.list')) return { ok: false, error: 'action-not-allowed' }
+  if (!adapter.listTasks) return { ok: false, error: 'not-implemented' }
+  const res = await adapter.listTasks({ filter: args.filter, options: args.options })
+  return { ok: !!res?.ok, error: (res as any)?.error, tasks: (res as any)?.tasks || [] }
+}
+
+export async function handleCancelTask(args: { agent: string; id: string }) {
+  const registry = SchedulerAdapterRegistry.instance()
+  await registry.initialize((global as any).__extensionContext || ({} as vscode.ExtensionContext))
+  const adapter = registry.get(args.agent.toLowerCase()) || registry.get('kilocode')
+  if (!adapter) return { ok: false, error: 'no-adapter' }
+  if (!isActionAllowed(adapter.id, 'task.cancel')) return { ok: false, error: 'action-not-allowed' }
+  if (!adapter.cancelTask) return { ok: false, error: 'not-implemented' }
+  const res = await adapter.cancelTask(args.id)
+  return { ok: !!res?.ok, error: (res as any)?.error }
 }

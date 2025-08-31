@@ -1,5 +1,5 @@
 import type * as vscode from 'vscode'
-import { ISchedulerAdapter, ScheduleSummary, TriggerOptions } from './ISchedulerAdapter'
+import { ISchedulerAdapter, ScheduleSummary, TriggerOptions, TaskSummary } from './ISchedulerAdapter'
 
 /**
  * Experimental stub for Roo Code adapter. No-op methods for now.
@@ -29,5 +29,10 @@ export class RooCodeAdapter implements ISchedulerAdapter {
     // No-op for now
     return
   }
-}
 
+  async sendMessage(_opts: { channel?: string; text: string; metadata?: Record<string, unknown> }): Promise<{ ok: boolean; data?: any }> { return { ok: true } }
+  async createTask(_opts: { title?: string; params?: Record<string, unknown> }): Promise<{ ok: boolean; task?: TaskSummary }> { return { ok: true, task: { id: String(Date.now()), title: _opts.title || 'Task', status: 'pending' } } }
+  async getTask(_id: string): Promise<{ ok: boolean; task?: TaskSummary }> { return { ok: false } }
+  async listTasks(): Promise<{ ok: boolean; tasks: TaskSummary[] }> { return { ok: true, tasks: [] } }
+  async cancelTask(_id: string): Promise<{ ok: boolean }> { return { ok: true } }
+}

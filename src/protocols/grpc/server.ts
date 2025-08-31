@@ -3,7 +3,7 @@ import * as vscode from 'vscode'
 
 import type * as grpcJs from '@grpc/grpc-js'
 import type * as protoLoader from '@grpc/proto-loader'
-import { handleA2ATrigger } from '../a2a'
+import { handleA2ATrigger, handleSendMessage, handleCreateTask, handleGetTask, handleListTasks, handleCancelTask } from '../a2a'
 import { getSetting } from '../../utils/config'
 
 let server: any | null = null
@@ -62,6 +62,51 @@ export async function startA2AGrpcServer(context: vscode.ExtensionContext) {
           callback(null, { ok: false, error: String(err?.message || 'exception') })
         }
       },
+      SendMessage: async (call: any, callback: any) => {
+        try {
+          const { targetAgent, channel, text, metadata } = call.request || {}
+          const res = await handleSendMessage({ agent: String(targetAgent || ''), channel, text, metadata })
+          callback(null, { ok: !!res?.ok, error: res?.error || '', data: res?.data || {} })
+        } catch (err: any) {
+          callback(null, { ok: false, error: String(err?.message || 'exception') })
+        }
+      },
+      CreateTask: async (call: any, callback: any) => {
+        try {
+          const { targetAgent, title, params } = call.request || {}
+          const res = await handleCreateTask({ agent: String(targetAgent || ''), title, params })
+          callback(null, { ok: !!res?.ok, error: res?.error || '', task: res?.task || null })
+        } catch (err: any) {
+          callback(null, { ok: false, error: String(err?.message || 'exception') })
+        }
+      },
+      GetTask: async (call: any, callback: any) => {
+        try {
+          const { targetAgent, id } = call.request || {}
+          const res = await handleGetTask({ agent: String(targetAgent || ''), id: String(id || '') })
+          callback(null, { ok: !!res?.ok, error: res?.error || '', task: res?.task || null })
+        } catch (err: any) {
+          callback(null, { ok: false, error: String(err?.message || 'exception') })
+        }
+      },
+      ListTasks: async (call: any, callback: any) => {
+        try {
+          const { targetAgent, filter, options } = call.request || {}
+          const res = await handleListTasks({ agent: String(targetAgent || ''), filter, options })
+          callback(null, { ok: !!res?.ok, error: res?.error || '', tasks: res?.tasks || [] })
+        } catch (err: any) {
+          callback(null, { ok: false, error: String(err?.message || 'exception'), tasks: [] })
+        }
+      },
+      CancelTask: async (call: any, callback: any) => {
+        try {
+          const { targetAgent, id } = call.request || {}
+          const res = await handleCancelTask({ agent: String(targetAgent || ''), id: String(id || '') })
+          callback(null, { ok: !!res?.ok, error: res?.error || '' })
+        } catch (err: any) {
+          callback(null, { ok: false, error: String(err?.message || 'exception') })
+        }
+      },
     })
     await new Promise<void>((resolve, reject) => {
       server!.bindAsync(`${host}:${port}`, grpc.ServerCredentials.createInsecure(), (err: any, _port: number) => {
@@ -84,4 +129,3 @@ export function stopA2AGrpcServer() {
     }
   } catch {}
 }
-

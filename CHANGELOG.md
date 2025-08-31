@@ -1,5 +1,31 @@
 # Changelog
 
+## [0.0.17] - 2025-08-31
+
+### Added
+- Full Agent Scheduler rename: package id now `agent-scheduler`, display name "Agent Scheduler"; contributes already under `agent-scheduler.*`.
+- A2A gRPC surface extended to a richer API:
+  - New RPCs in `src/protocols/grpc/a2a.proto`: `SendMessage`, `CreateTask`, `GetTask`, `ListTasks`, `CancelTask` alongside `Invoke`.
+  - Server routing in `src/protocols/grpc/server.ts` wired to new handlers in `src/protocols/a2a.ts`.
+  - Client helpers in `src/protocols/grpc/client.ts` for new RPCs.
+- Richer adapter API:
+  - `ISchedulerAdapter` adds optional methods: `sendMessage`, `createTask`, `getTask`, `listTasks`, `cancelTask`.
+  - `KiloCodeAdapter` implements task/message semantics mapped to schedules and existing triggers; other adapters stubbed pending upstream APIs.
+- Settings schema updates:
+  - `agent-scheduler.experimental.agents.kilocode.allowedActions` now accepts extended actions: `message`, `task.create`, `task.get`, `task.list`, `task.cancel` (defaults enabled for Kilo Code).
+- Mapping report command:
+  - New command `agent-scheduler.generateMappingReport` generates `agent-scheduler.mapping.md` with auto-discovered commands and persists settings.
+- Tests:
+  - `src/__tests__/protocols/a2a_rpcs.test.ts` validates handler routing for new RPCs.
+  - `src/__tests__/mcp_endpoint.test.ts` mocks MCP HTTP transport and calls `a2a.invoke` end-to-end.
+
+### Changed
+- Bumped version to `0.0.17`.
+- MCP endpoint and gRPC server startup remain feature-flagged; MCP HTTP remains loopback-only.
+
+### Notes
+- The extended RPC set aligns with community A2A proposals (message send; task CRUD-like flows). Adapters are intentionally permissive on Kilo Code; other agents expose stubs until we can integrate their official APIs/commands.
+
 ## [0.0.16] - 2025-08-31
 
 ### Added

@@ -17,7 +17,77 @@ message A2AResult {
   google.protobuf.Struct data = 3; // optional data (e.g., list results)
 }
 
-service A2AService {
-  rpc Invoke (A2AMessage) returns (A2AResult);
+// Richer RPCs aligned with common agent-to-agent needs
+message SendMessageRequest {
+  string targetAgent = 1;
+  string channel = 2; // optional
+  string text = 3;
+  google.protobuf.Struct metadata = 4;
 }
 
+message SendMessageResult {
+  bool ok = 1;
+  string error = 2;
+  google.protobuf.Struct data = 3;
+}
+
+message TaskData {
+  string id = 1;
+  string title = 2;
+  string status = 3; // pending|running|completed|cancelled|failed|scheduled
+  google.protobuf.Struct details = 4;
+}
+
+message CreateTaskRequest {
+  string targetAgent = 1;
+  string title = 2;
+  google.protobuf.Struct params = 3; // instruction/mode/etc
+}
+
+message CreateTaskResult {
+  bool ok = 1;
+  string error = 2;
+  TaskData task = 3;
+}
+
+message GetTaskRequest {
+  string targetAgent = 1;
+  string id = 2;
+}
+
+message GetTaskResult {
+  bool ok = 1;
+  string error = 2;
+  TaskData task = 3;
+}
+
+message ListTasksRequest {
+  string targetAgent = 1;
+  string filter = 2;
+  google.protobuf.Struct options = 3;
+}
+
+message ListTasksResult {
+  bool ok = 1;
+  string error = 2;
+  repeated TaskData tasks = 3;
+}
+
+message CancelTaskRequest {
+  string targetAgent = 1;
+  string id = 2;
+}
+
+message CancelTaskResult {
+  bool ok = 1;
+  string error = 2;
+}
+
+service A2AService {
+  rpc Invoke (A2AMessage) returns (A2AResult);
+  rpc SendMessage (SendMessageRequest) returns (SendMessageResult);
+  rpc CreateTask (CreateTaskRequest) returns (CreateTaskResult);
+  rpc GetTask (GetTaskRequest) returns (GetTaskResult);
+  rpc ListTasks (ListTasksRequest) returns (ListTasksResult);
+  rpc CancelTask (CancelTaskRequest) returns (CancelTaskResult);
+}

@@ -110,6 +110,26 @@ export async function activate(context: vscode.ExtensionContext) {
 		})
 	)
 
+	// Command to generate a mapping report and persist settings
+	context.subscriptions.push(
+		vscode.commands.registerCommand('agent-scheduler.generateMappingReport', async () => {
+			try {
+				const discovered = await discoverAgentCommands()
+				await persistDiscoveredAgentCommands(discovered)
+				const header = `# Agent Command Mapping\n\nGenerated on ${new Date().toISOString()}\n\n`
+				const tableHead = `| Agent | Extension ID | Trigger Command | List Command |\n|---|---|---|---|\n`
+				const rows = discovered.map(d => `| ${d.agent} | ${d.extensionId ?? ''} | ${d.triggerCommand ?? ''} | ${d.listCommand ?? ''} |`).join('\n')
+				const md = header + tableHead + rows + '\n'
+				const ws = getWorkspacePath()
+				const dest = path.join(ws || (__dirname), 'agent-scheduler.mapping.md')
+				await fs.writeFile(dest, md, 'utf8')
+				vscode.window.showInformationMessage(`Agent mapping report written to ${dest}`)
+			} catch (e:any) {
+				vscode.window.showErrorMessage(`Failed to generate mapping report: ${e?.message || e}`)
+			}
+		})
+	)
+
 	// Register command to handle schedule updates and notify the webview
 	context.subscriptions.push(
 		vscode.commands.registerCommand("agent-scheduler.schedulesUpdated", async () => {

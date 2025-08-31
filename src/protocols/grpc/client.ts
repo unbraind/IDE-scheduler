@@ -55,3 +55,52 @@ export async function invokeA2A(context: vscode.ExtensionContext, message: any):
   })
 }
 
+export async function sendMessage(context: vscode.ExtensionContext, args: { target: { agent: string }, channel?: string, text: string, metadata?: any }): Promise<any> {
+  const c = await getClient(context)
+  if (!c) return { ok: false, error: 'grpc-client-disabled' }
+  return new Promise((resolve) => {
+    c.SendMessage({ targetAgent: args.target.agent, channel: args.channel || '', text: args.text, metadata: args.metadata || {} }, (err: any, res: any) => {
+      if (err) resolve({ ok: false, error: String(err?.message || 'grpc-error') }); else resolve(res)
+    })
+  })
+}
+
+export async function createTask(context: vscode.ExtensionContext, args: { target: { agent: string }, title?: string, params?: any }): Promise<any> {
+  const c = await getClient(context)
+  if (!c) return { ok: false, error: 'grpc-client-disabled' }
+  return new Promise((resolve) => {
+    c.CreateTask({ targetAgent: args.target.agent, title: args.title || '', params: args.params || {} }, (err: any, res: any) => {
+      if (err) resolve({ ok: false, error: String(err?.message || 'grpc-error') }); else resolve(res)
+    })
+  })
+}
+
+export async function getTask(context: vscode.ExtensionContext, args: { target: { agent: string }, id: string }): Promise<any> {
+  const c = await getClient(context)
+  if (!c) return { ok: false, error: 'grpc-client-disabled' }
+  return new Promise((resolve) => {
+    c.GetTask({ targetAgent: args.target.agent, id: args.id }, (err: any, res: any) => {
+      if (err) resolve({ ok: false, error: String(err?.message || 'grpc-error') }); else resolve(res)
+    })
+  })
+}
+
+export async function listTasks(context: vscode.ExtensionContext, args: { target: { agent: string }, filter?: string, options?: any }): Promise<any> {
+  const c = await getClient(context)
+  if (!c) return { ok: false, error: 'grpc-client-disabled' }
+  return new Promise((resolve) => {
+    c.ListTasks({ targetAgent: args.target.agent, filter: args.filter || '', options: args.options || {} }, (err: any, res: any) => {
+      if (err) resolve({ ok: false, error: String(err?.message || 'grpc-error') }); else resolve(res)
+    })
+  })
+}
+
+export async function cancelTask(context: vscode.ExtensionContext, args: { target: { agent: string }, id: string }): Promise<any> {
+  const c = await getClient(context)
+  if (!c) return { ok: false, error: 'grpc-client-disabled' }
+  return new Promise((resolve) => {
+    c.CancelTask({ targetAgent: args.target.agent, id: args.id }, (err: any, res: any) => {
+      if (err) resolve({ ok: false, error: String(err?.message || 'grpc-error') }); else resolve(res)
+    })
+  })
+}
