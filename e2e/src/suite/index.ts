@@ -4,10 +4,10 @@ import { glob } from "glob"
 import * as vscode from "vscode"
 
 export async function run() {
-	console.log("Starting Roo Scheduler extension tests");
+	console.log("Starting Kilo Scheduler extension tests");
 
 	// Ensure the scheduler extension is active
-	const schedulerExtension = vscode.extensions.getExtension("KyleHoskins.roo-scheduler");
+	const schedulerExtension = vscode.extensions.getExtension("KyleHoskins.kilo-scheduler");
 	if (!schedulerExtension) {
 		throw new Error("Scheduler extension not found");
 	}
@@ -18,29 +18,29 @@ export async function run() {
 	}
 	console.log("Scheduler extension is active");
 
-	// Check if Roo-cline extension is available
-	const rooClineExtension = vscode.extensions.getExtension("rooveterinaryinc.roo-cline");
-	if (rooClineExtension) {
-		console.log("Roo-cline extension found");
-		if (!rooClineExtension.isActive) {
+	// Check if Kilo Code extension is available
+	const kiloCodeExtension = vscode.extensions.getExtension("kilocode.kilo-code");
+	if (kiloCodeExtension) {
+		console.log("Kilo Code extension found");
+		if (!kiloCodeExtension.isActive) {
 			try {
-				console.log("Activating Roo-cline extension...");
-				await rooClineExtension.activate();
-				console.log("Roo-cline extension activated successfully");
+				console.log("Activating Kilo Code extension...");
+				await kiloCodeExtension.activate();
+				console.log("Kilo Code extension activated successfully");
 			} catch (error) {
-				console.log("Failed to activate Roo-cline extension:", error instanceof Error ? error.message : String(error));
+				console.log("Failed to activate Kilo Code extension:", error instanceof Error ? error.message : String(error));
 				console.log("Some tests may be skipped");
 			}
 		} else {
-			console.log("Roo-cline extension is already active");
+			console.log("Kilo Code extension is already active");
 		}
 	} else {
-		console.log("Roo-cline extension not found. Some tests may be skipped.");
+		console.log("Kilo Code extension not found. Some tests may be skipped.");
 	}
 
 	// Focus the scheduler sidebar view if available
 	try {
-		await vscode.commands.executeCommand("roo-scheduler.SidebarProvider.focus");
+		await vscode.commands.executeCommand("kilo-scheduler.SidebarProvider.focus");
 		console.log("Focused Scheduler sidebar view");
 	} catch (error) {
 		console.log("Failed to focus Scheduler sidebar view:", error instanceof Error ? error.message : String(error));

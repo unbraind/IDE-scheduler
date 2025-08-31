@@ -39,7 +39,7 @@ export const webviewMessageHandler = async (provider: any, message: WebviewMessa
 				const workspaceRoot = getWorkspacePath();
 				if (workspaceRoot) {
 					// Resolve the full path to schedules.json
-					const schedulesFilePath = path.join(workspaceRoot, ".roo", "schedules.json");
+					const schedulesFilePath = path.join(workspaceRoot, ".kilo", "schedules.json");
 					
 					try {
 						// Read the current schedules file content
@@ -50,7 +50,7 @@ export const webviewMessageHandler = async (provider: any, message: WebviewMessa
 							// Post the content back to the webview
 							provider.postMessageToWebview({
 								type: "fileContent",
-								path: "./.roo/schedules.json",
+								path: "./.kilo/schedules.json",
 								content: fileContent
 							});
 						}
@@ -253,7 +253,7 @@ export const webviewMessageHandler = async (provider: any, message: WebviewMessa
 			break
 		case "openFile":
 			// Special handling for schedules.json file
-			if (message.text === "./.roo/schedules.json") {
+			if (message.text === "./.kilo/schedules.json") {
 				try {
 					// Get workspace root
 					const workspaceRoot = getWorkspacePath()
@@ -379,7 +379,7 @@ export const webviewMessageHandler = async (provider: any, message: WebviewMessa
 			await provider.context.globalState.update("allowedCommands", message.commands)
 			// Also update workspace settings
 			await vscode.workspace
-				.getConfiguration("roo-cline")
+				.getConfiguration("kilo-code")
 				.update("allowedCommands", message.commands, vscode.ConfigurationTarget.Global)
 			break
 		case "openMcpSettings": {
@@ -904,7 +904,7 @@ export const webviewMessageHandler = async (provider: any, message: WebviewMessa
 			break
 		case "humanRelayResponse":
 			if (message.requestId && message.text) {
-				vscode.commands.executeCommand("roo-scheduler.handleHumanRelayResponse", {
+				vscode.commands.executeCommand("kilo-scheduler.handleHumanRelayResponse", {
 					requestId: message.requestId,
 					text: message.text,
 					cancelled: false,
@@ -913,7 +913,7 @@ export const webviewMessageHandler = async (provider: any, message: WebviewMessa
 			break
 case "humanRelayCancel":
 	if (message.requestId) {
-		vscode.commands.executeCommand("roo-scheduler.handleHumanRelayResponse", {
+		vscode.commands.executeCommand("kilo-scheduler.handleHumanRelayResponse", {
 			requestId: message.requestId,
 			cancelled: true,
 		})
@@ -924,15 +924,15 @@ case "resumeTask":
 	if (message.taskId) {
 		try {
 			console.log(`Attempting to resume task with ID: ${message.taskId}`);
-			const { RooService } = await import("../../services/scheduler/RooService");
+			const { KiloService } = await import("../../services/scheduler/KiloService");
 			
 			// First, try to open the Roo Cline extension directly
 			console.log("Opening Roo Cline extension...");
-			await vscode.commands.executeCommand("workbench.view.extension.roo-cline-ActivityBar");
+			await vscode.commands.executeCommand("kilo-code.SidebarProvider.focus");
 			
 			// Then resume the task
 			console.log("Resuming task...");
-			await RooService.resumeTask(message.taskId);
+			await KiloService.resumeTask(message.taskId);
 			console.log("Task resume completed successfully");
 		} catch (error) {
 			console.error("Failed to resume task:", error);

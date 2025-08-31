@@ -18,15 +18,15 @@ suite("Scheduler Extension - Add Schedule", () => {
 		const workspacePath = workspaceFolders[0].uri.fsPath;
 		console.log("Using workspace path:", workspacePath);
 
-		// Prepare .roo directory and schedules.json path
-		const rooDir = path.join(workspacePath, ".roo");
-		const schedulesFile = path.join(rooDir, "schedules.json");
+		// Prepare .kilo directory and schedules.json path
+		const kiloDir = path.join(workspacePath, ".kilo");
+		const schedulesFile = path.join(kiloDir, "schedules.json");
 		console.log("Schedules file path:", schedulesFile);
 
 		try {
-			// Ensure .roo directory exists
-			await fs.mkdir(rooDir, { recursive: true });
-			console.log("Created .roo directory");
+			// Ensure .kilo directory exists
+			await fs.mkdir(kiloDir, { recursive: true });
+			console.log("Created .kilo directory");
 
 			// Create a new schedule with a unique ID to avoid conflicts
 			const testId = `test-schedule-${Date.now()}`;
@@ -56,7 +56,7 @@ suite("Scheduler Extension - Add Schedule", () => {
 			console.log("Wrote schedule to file");
 
 			// Activate the extension and reload schedules
-			const extension = vscode.extensions.getExtension("KyleHoskins.roo-scheduler");
+			const extension = vscode.extensions.getExtension("KyleHoskins.kilo-scheduler");
 			assert.ok(extension, "Scheduler extension not found");
 			if (!extension.isActive) {
 				await extension.activate();
@@ -80,8 +80,8 @@ suite("Scheduler Extension - Add Schedule", () => {
 						update: () => Promise.resolve()
 					},
 					extensionPath: workspacePath,
-					storagePath: path.join(workspacePath, '.roo'),
-					logPath: path.join(workspacePath, '.roo', 'logs')
+					storagePath: path.join(workspacePath, '.kilo'),
+					logPath: path.join(workspacePath, '.kilo', 'logs')
 				};
 				
 				const service = SchedulerService.getInstance(mockContext);
@@ -121,7 +121,7 @@ suite("Scheduler Extension - Add Schedule", () => {
 		this.timeout(10000); // 10 seconds timeout
 		
 		// Activate the extension
-		const extension = vscode.extensions.getExtension("KyleHoskins.roo-scheduler");
+		const extension = vscode.extensions.getExtension("KyleHoskins.kilo-scheduler");
 		assert.ok(extension, "Scheduler extension not found");
 		if (!extension.isActive) {
 			await extension.activate();
@@ -145,8 +145,8 @@ suite("Scheduler Extension - Add Schedule", () => {
 					update: () => Promise.resolve()
 				},
 				extensionPath: __dirname,
-				storagePath: path.join(__dirname, '.roo'),
-				logPath: path.join(__dirname, '.roo', 'logs')
+				storagePath: path.join(__dirname, '.kilo'),
+				logPath: path.join(__dirname, '.kilo', 'logs')
 			};
 			
 			const service = SchedulerService.getInstance(mockContext);

@@ -2,20 +2,20 @@ import * as vscode from "vscode"
 import { EditorUtils } from "./EditorUtils"
 
 export const ACTION_NAMES = {
-	EXPLAIN: "Roo Code: Explain Code",
-	FIX: "Roo Code: Fix Code",
-	FIX_LOGIC: "Roo Code: Fix Logic",
-	IMPROVE: "Roo Code: Improve Code",
-	ADD_TO_CONTEXT: "Roo Code: Add to Context",
-	NEW_TASK: "Roo Code: New Task",
+	EXPLAIN: "Kilo Code: Explain Code",
+	FIX: "Kilo Code: Fix Code",
+	FIX_LOGIC: "Kilo Code: Fix Logic",
+	IMPROVE: "Kilo Code: Improve Code",
+	ADD_TO_CONTEXT: "Kilo Code: Add to Context",
+	NEW_TASK: "Kilo Code: New Task",
 } as const
 
 export const COMMAND_IDS = {
-	EXPLAIN: "roo-scheduler.explainCode",
-	FIX: "roo-scheduler.fixCode",
-	IMPROVE: "roo-scheduler.improveCode",
-	ADD_TO_CONTEXT: "roo-scheduler.addToContext",
-	NEW_TASK: "roo-scheduler.newTask",
+	EXPLAIN: "kilo-scheduler.explainCode",
+	FIX: "kilo-scheduler.fixCode",
+	IMPROVE: "kilo-scheduler.improveCode",
+	ADD_TO_CONTEXT: "kilo-scheduler.addToContext",
+	NEW_TASK: "kilo-scheduler.newTask",
 } as const
 
 export class CodeActionProvider implements vscode.CodeActionProvider {

@@ -1,25 +1,25 @@
 import * as vscode from 'vscode';
-import { RooCodeAPI } from '../../roo-code';
+import { KiloCodeAPI } from '../../kilo-code';
 
 /**
- * Service for interacting with the Roo Cline extension.
+ * Service for interacting with the Kilo Code extension.
  */
-export class RooService {
+export class KiloService {
   /**
-   * Starts a new task in the Roo Cline extension with the specified mode and instructions.
+   * Starts a new task in the Kilo Code extension with the specified mode and instructions.
    * @param mode The mode slug to use.
    * @param taskInstructions The instructions for the task.
-   * @throws Error if the Roo Cline extension or its API is not available.
-   */
+   * @throws Error if the Kilo Code extension or its API is not available.
+  */
   /**
-   * Starts a new task in the Roo Cline extension with the specified mode and instructions.
+   * Starts a new task in the Kilo Code extension with the specified mode and instructions.
    * @param mode The mode slug to use.
    * @param taskInstructions The instructions for the task.
    * @returns The ID of the new task.
-   * @throws Error if the Roo Cline extension or its API is not available.
-   */
+   * @throws Error if the Kilo Code extension or its API is not available.
+  */
   public static async startTaskWithMode(mode: string, taskInstructions: string): Promise<string> {
-    const api = RooService.getRooClineApi();
+    const api = KiloService.getKiloCodeApi();
     console.log('got api', api);
     // Get the current configuration
     const config = api.getConfiguration();
@@ -43,17 +43,17 @@ export class RooService {
   }
 
   /**
-   * Gets the Roo Cline API instance, or throws if not available.
+   * Gets the Kilo Code API instance, or throws if not available.
    * @private
    */
-  private static getRooClineApi() {
-    const extension = vscode.extensions.getExtension<RooCodeAPI>("rooveterinaryinc.roo-cline");
+  private static getKiloCodeApi() {
+    const extension = vscode.extensions.getExtension<KiloCodeAPI>("kilocode.kilo-code");
     if (!extension?.isActive) {
-      throw new Error("Roo Cline extension is not activated");
+      throw new Error("Kilo Code extension is not activated");
     }
     const api = extension.exports;
     if (!api) {
-      throw new Error("Roo Cline API is not available");
+      throw new Error("Kilo Code API is not available");
     }
     return api;
   }
@@ -64,7 +64,7 @@ export class RooService {
    * @private
    */
   private static getTaskHistoryAndStack(): {taskHistory: any[], taskStack: string[]} {
-    const api = RooService.getRooClineApi();
+    const api = KiloService.getKiloCodeApi();
     const taskStack = api.getCurrentTaskStack();
 
     const config = api.getConfiguration();
@@ -97,7 +97,7 @@ export class RooService {
    * @returns The timestamp (ms since epoch) of the last activity, or undefined if not found.
    */
   public static async getLastActivityTime(excludedTaskId?: string): Promise<number | undefined> {
-    let {taskHistory} = RooService.getTaskHistoryAndStack();
+    let {taskHistory} = KiloService.getTaskHistoryAndStack();
     if (!taskHistory) {
       return undefined;
     }
@@ -116,7 +116,7 @@ export class RooService {
    * @returns Promise<boolean> - true if there is an active task and its most recent activity is within the duration from now, otherwise false.
    */
   public static async isActiveTaskWithinDuration(durationMs: number): Promise<boolean> {
-    const lastActivityTime = await RooService.getLastActivityTimeForActiveTask();
+    const lastActivityTime = await KiloService.getLastActivityTimeForActiveTask();
     if (!lastActivityTime) {
       return false;
     }
@@ -129,7 +129,7 @@ export class RooService {
    * @returns Promise<boolean> - true if there is an active task, otherwise false.
    */
   public static async hasActiveTask(): Promise<boolean> {
-    const api = RooService.getRooClineApi();
+    const api = KiloService.getKiloCodeApi();
     const taskStack = api.getCurrentTaskStack();
     return !!taskStack && taskStack.length > 0;
   }
@@ -139,7 +139,7 @@ export class RooService {
    * @returns Promise<boolean> - true if a task was interrupted, false if no active task.
    */
   public static async interruptActiveTask(): Promise<boolean> {
-    const api = RooService.getRooClineApi();
+    const api = KiloService.getKiloCodeApi();
     const taskStack = api.getCurrentTaskStack();
     
     if (!taskStack || taskStack.length === 0) {
@@ -152,22 +152,22 @@ export class RooService {
   }
   
   /**
-   * Resumes a task with the given ID and opens the Roo Cline extension.
+   * Resumes a task with the given ID and opens the Kilo Code extension.
    * @param taskId The ID of the task to resume.
    * @returns Promise<void>
-   * @throws Error if the task is not found in the task history or the Roo Cline extension is not available.
-   */
+   * @throws Error if the task is not found in the task history or the Kilo Code extension is not available.
+  */
   public static async resumeTask(taskId: string): Promise<void> {
-    console.log(`RooService.resumeTask called with taskId: ${taskId}`);
+    console.log(`KiloService.resumeTask called with taskId: ${taskId}`);
     
     if (!taskId) {
       console.error("Task ID is empty or undefined");
       throw new Error("Task ID is required to resume a task");
     }
   
-    console.log("Getting Roo Cline API...");
-    const api = RooService.getRooClineApi();
-    console.log("Roo Cline API obtained successfully");
+    console.log("Getting Kilo Code API...");
+    const api = KiloService.getKiloCodeApi();
+    console.log("Kilo Code API obtained successfully");
     
     try {
       // First, check if the task exists in history
@@ -179,20 +179,20 @@ export class RooService {
       }
       console.log(`Task with ID ${taskId} found in history`);
       
-      // Try different approaches to open the Roo Cline extension
+      // Try different approaches to open the Kilo Code extension
       try {
         // First try the direct command
-        console.log("Opening Roo Cline extension via direct command...");
-        await vscode.commands.executeCommand("workbench.view.extension.roo-cline-ActivityBar");
+        console.log("Opening Kilo Code extension via direct command...");
+        await vscode.commands.executeCommand("kilo-code.SidebarProvider.focus");
       } catch (cmdError) {
-        console.error("Error opening Roo Cline extension via direct command:", cmdError);
+        console.error("Error opening Kilo Code extension via direct command:", cmdError);
         
         // Try the registered command in our extension
         try {
-          console.log("Opening Roo Cline extension via our registered command...");
-          await vscode.commands.executeCommand("roo-scheduler.openRooClineExtension");
+          console.log("Opening Kilo Code extension via our registered command...");
+          await vscode.commands.executeCommand("kilo-scheduler.openKiloCodeExtension");
         } catch (regCmdError) {
-          console.error("Error opening Roo Cline extension via registered command:", regCmdError);
+          console.error("Error opening Kilo Code extension via registered command:", regCmdError);
           // Continue anyway, as the resumeTask might still work
         }
       }

@@ -1,17 +1,17 @@
 <div align="center">
-  <img src="https://kylehoskinswebsite.s3.us-east-2.amazonaws.com/RooSchedulerPreview.png?v=2" alt="Roo Scheduler Icon" width="600" />
+  <img src="https://kylehoskinswebsite.s3.us-east-2.amazonaws.com/RooSchedulerPreview.png?v=2" alt="Kilo Scheduler Icon" width="600" />
 </div>
 
 <div align="center">
-<h1>Roo Scheduler</h1>
+<h1>Kilo Scheduler</h1>
 
 <a href="https://marketplace.visualstudio.com/items?itemName=KyleHoskins.roo-scheduler" target="_blank"><img src="https://img.shields.io/badge/Download%20on%20VS%20Marketplace-blue?style=for-the-badge&logo=visualstudiocode&logoColor=white" alt="Download on VS Marketplace"></a>
 
 </div>
 
-**Roo Scheduler** is a task scheduling extension for VS Code that seamlessly integrates with [Roo Code](https://roocode.com/). It allows you to automate recurring tasks and workflows directly within your development environment.  
+**Kilo Scheduler** is a task scheduling extension for VS Code that seamlessly integrates with [Kilo Code](https://github.com/Kilo-Org/kilocode). It allows you to automate recurring tasks and workflows directly within your development environment.  
 
-This extension was created from a fork of [Roo Code](https://roocode.com/) and designed using similar patterns/components to act as a functional community proof of concept and make it easier to merge if folks might want such a feature in [Roo Code](https://roocode.com/) itself.
+This extension was created from a fork of Roo Scheduler and adapted to work with [Kilo Code](https://github.com/Kilo-Org/kilocode), using similar patterns/components.
 
 ## Key Features
 
@@ -28,12 +28,12 @@ This extension was created from a fork of [Roo Code](https://roocode.com/) and d
 - **Interrupt Mode**: Automatically interrupt any running task to execute the scheduled task
 - **Skip Mode**: Skip execution if another task is already running
 
-### Seamless [Roo Code](https://roocode.com/) Integration
+### Seamless [Kilo Code](https://github.com/Kilo-Org/kilocode) Integration
 
-Roo Scheduler connects with [Roo Code](https://roocode.com/)'s extension points which allow it to:
+Kilo Scheduler connects with [Kilo Code](https://github.com/Kilo-Org/kilocode)'s extension points which allow it to:
 
-- Start new tasks in any available [Roo Code](https://roocode.com/) mode
-- Pass custom instructions to [Roo Code](https://roocode.com/) for each scheduled task
+- Start new tasks in any available Kilo Code mode
+- Pass custom instructions to Kilo Code for each scheduled task
 - Provides options to execute after specified inactivity, interrupt existing tasks, or skip execution of a schedule
 
 ## Use Cases
@@ -51,6 +51,6 @@ Roo Scheduler connects with [Roo Code](https://roocode.com/)'s extension points 
 
 ## License
 
-[Apache 2.0 © 2025 Roo Scheduler](./LICENSE)
+[Apache 2.0 © 2025 Kilo Scheduler](./LICENSE)
 
-Note: This project is maintained by a [Roo Code](https://roocode.com/) fan/contributor rather than the [Roo Code](https://roocode.com/) team.  Feel free to suggest features/ideas/fixes via an issue or [contribute to the project](CONTRIBUTING.md)!
+Note: This project is maintained by a [Kilo Code](https://github.com/Kilo-Org/kilocode) fan/contributor rather than the Kilo Code team.  Feel free to suggest features/ideas/fixes via an issue or [contribute to the project](CONTRIBUTING.md)!

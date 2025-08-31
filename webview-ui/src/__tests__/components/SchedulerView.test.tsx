@@ -6,14 +6,14 @@
  */
 let mockSchedules: any[] = [];
 const mockPostMessage = jest.fn((msg) => {
-  if (msg && msg.type === "openFile" && msg.text === "./.roo/schedules.json") {
+  if (msg && msg.type === "openFile" && msg.text === "./.kilo/schedules.json") {
     // Use setImmediate if available, otherwise fallback to setTimeout
     const dispatch = () => {
       window.dispatchEvent(
         new MessageEvent("message", {
           data: {
             type: "fileContent",
-            path: "./.roo/schedules.json",
+            path: "./.kilo/schedules.json",
             content: JSON.stringify({ schedules: mockSchedules }),
           },
         })

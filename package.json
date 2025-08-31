@@ -1,7 +1,7 @@
 {
-	"name": "roo-scheduler",
-	"displayName": "Roo Scheduler",
-	"description": "A task scheduler for Roo Code",
+	"name": "kilo-scheduler",
+	"displayName": "Kilo Scheduler",
+	"description": "A task scheduler for Kilo Code",
 	"publisher": "KyleHoskins",
 	"version": "0.0.11",
 	"icon": "assets/icons/scheduler-icon.png",
@@ -14,13 +14,13 @@
 		"node": "20.18.1"
 	},
 	"author": {
-		"name": "Roo Scheduler"
+		"name": "Kilo Scheduler"
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/kyle-apex/roo-scheduler"
+		"url": "https://github.com/kyle-apex/kilo-scheduler"
 	},
-	"homepage": "https://github.com/kyle-apex/roo-scheduler",
+	"homepage": "https://github.com/kyle-apex/kilo-scheduler",
 	"categories": [
 		"AI",
 		"Chat",
@@ -30,7 +30,6 @@
 		"Testing"
 	],
 	"keywords": [
-		"cline",
 		"claude",
 		"dev",
 		"mcp",
@@ -42,10 +41,10 @@
 		"sonnet",
 		"ai",
 		"llama",
-		"roo scheduler",
 		"scheduler",
-		"roo code",
-		"roo"
+		"kilo",
+		"kilo-code",
+		"kilo-scheduler"
 	],
 	"activationEvents": [
 		"onLanguage",
@@ -53,54 +52,54 @@
 	],
 	"main": "./dist/extension.js",
 	"extensionDependencies": [
-		"rooveterinaryinc.roo-cline"
+		"kilocode.kilo-code"
 	],
 	"contributes": {
 		"viewsContainers": {
 			"activitybar": [
 				{
-					"id": "roo-scheduler-ActivityBar",
-					"title": "Roo Scheduler",
+					"id": "kilo-scheduler-ActivityBar",
+					"title": "Kilo Scheduler",
 					"icon": "assets/icons/scheduler-icon.svg"
 				}
 			]
 		},
 		"views": {
-			"roo-scheduler-ActivityBar": [
+			"kilo-scheduler-ActivityBar": [
 				{
 					"type": "webview",
-					"id": "roo-scheduler.SidebarProvider",
+					"id": "kilo-scheduler.SidebarProvider",
 					"name": ""
 				}
 			]
 		},
 		"commands": [
 			{
-				"command": "roo-scheduler.reloadWindowDev",
+				"command": "kilo-scheduler.reloadWindowDev",
 				"title": "Reload Window (Dev Only)",
 				"icon": "$(refresh)",
 				"category": "Developer"
 			},
 			{
-				"command": "roo-scheduler.openRooClineExtension",
-				"title": "Open Roo Code Extension",
+				"command": "kilo-scheduler.openKiloCodeExtension",
+				"title": "Open Kilo Code Extension",
 				"icon": {
-					"light": "assets/icons/roo-icon-black.svg",
-					"dark": "assets/icons/roo-icon-white.svg"
+					"light": "assets/icons/kilo-dark.svg",
+					"dark": "assets/icons/kilo-light.svg"
 				}
 			}
 		],
 		"menus": {
 			"view/title": [
 				{
-					"command": "roo-scheduler.reloadWindowDev",
+					"command": "kilo-scheduler.reloadWindowDev",
 					"group": "navigation@0",
-					"when": "view == roo-scheduler.SidebarProvider && rooSchedulerDevMode"
+					"when": "view == kilo-scheduler.SidebarProvider && kiloSchedulerDevMode"
 				},
 				{
-					"command": "roo-scheduler.openRooClineExtension",
+					"command": "kilo-scheduler.openKiloCodeExtension",
 					"group": "navigation@1",
-					"when": "view == roo-scheduler.SidebarProvider"
+					"when": "view == kilo-scheduler.SidebarProvider"
 				}
 			]
 		}
@@ -129,7 +128,7 @@
 		"test:extension": "jest",
 		"test:webview": "cd webview-ui && npm run test",
 		"test:e2e": "npm run vscode-test && cd e2e && npm run test",
-		"test:rooservice": "npm run vscode-test && cd e2e && npm run test:rooservice",
+		"test:kiloservice": "npm run vscode-test && cd e2e && npm run test:kiloservice",
 		"test:e2e:all": "npm run vscode-test && cd e2e && npm run test:all",
 		"prepare": "husky",
 		"publish:marketplace": "vsce publish && ovsx publish",

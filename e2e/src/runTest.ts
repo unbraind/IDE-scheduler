@@ -18,9 +18,9 @@ async function main() {
 
 		// Additional launch arguments
 		const launchArgs = [
-			// Enable the proposed API for Roo-cline extension
-			'--enable-proposed-api=RooVeterinaryInc.roo-cline',
-			// Don't disable all extensions, as we need the Roo-cline extension to be available
+			// Enable the proposed API for Kilo Code extension
+			'--enable-proposed-api=kilocode.kilo-code',
+			// Don't disable all extensions, as we need the Kilo Code extension to be available
 			'--disable-extension=ms-vscode.vscode-typescript-next'
 		];
 		console.log(`Launch arguments: ${launchArgs.join(', ')}`);

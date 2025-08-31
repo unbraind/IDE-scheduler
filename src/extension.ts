@@ -22,7 +22,6 @@ import { CodeActionProvider } from "./core/CodeActionProvider"
 import { migrateSettings } from "./utils/migrateSettings"
 import { formatLanguage } from "./shared/language"
 import { ClineProvider } from "./core/webview/ClineProvider"
-import { RooService } from "./services/scheduler/RooService"
 /**
  * Built using https://github.com/microsoft/vscode-webview-ui-toolkit
  *
@@ -38,14 +37,14 @@ let extensionContext: vscode.ExtensionContext
 // Your extension is activated the very first time the command is executed.
 export async function activate(context: vscode.ExtensionContext) {
 	extensionContext = context
-	outputChannel = vscode.window.createOutputChannel("Roo-Code")
+    outputChannel = vscode.window.createOutputChannel("Kilo-Code")
 	context.subscriptions.push(outputChannel)
-	outputChannel.appendLine("Roo-Code extension activated")
+    outputChannel.appendLine("Kilo-Code extension activated")
 
 	// Set a custom context variable for development mode
 	// This is used to conditionally show the reload window button
 	const isDevelopmentMode = context.extensionMode === vscode.ExtensionMode.Development
-	await vscode.commands.executeCommand('setContext', 'rooSchedulerDevMode', isDevelopmentMode)
+    await vscode.commands.executeCommand('setContext', 'kiloSchedulerDevMode', isDevelopmentMode)
 	
 	// Migrate old settings to new
 	await migrateSettings(context, outputChannel)
@@ -61,7 +60,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
 
 	// Get default commands from configuration.
-	const defaultCommands = vscode.workspace.getConfiguration("roo-cline").get<string[]>("allowedCommands") || []
+    const defaultCommands = vscode.workspace.getConfiguration("kilo-code").get<string[]>("allowedCommands") || []
 
 	// Initialize global state if not already set.
 	if (!context.globalState.get("allowedCommands")) {
@@ -70,21 +69,21 @@ export async function activate(context: vscode.ExtensionContext) {
 	
 	// Register command to reload window (dev only button)
 	context.subscriptions.push(
-		vscode.commands.registerCommand("roo-scheduler.reloadWindowDev", async () => {
+    vscode.commands.registerCommand("kilo-scheduler.reloadWindowDev", async () => {
 			await vscode.commands.executeCommand("workbench.action.reloadWindow")
 		})
 	)
 
 	// Register command to open the roo-cline extension (always register)
 	context.subscriptions.push(
-		vscode.commands.registerCommand("roo-scheduler.openRooClineExtension", async () => {
-			await vscode.commands.executeCommand("workbench.view.extension.roo-cline-ActivityBar")
+    vscode.commands.registerCommand("kilo-scheduler.openKiloCodeExtension", async () => {
+            await vscode.commands.executeCommand("kilo-code.SidebarProvider.focus")
 		})
 	)
 
 	// Register command to handle schedule updates and notify the webview
 	context.subscriptions.push(
-		vscode.commands.registerCommand("roo-scheduler.schedulesUpdated", async () => {
+    vscode.commands.registerCommand("kilo-scheduler.schedulesUpdated", async () => {
 			// This command is called when schedules are updated
 			// Simply trigger a state refresh which will cause the webview to reload its data
 			console.log("Schedules updated sending message to webview")
@@ -134,13 +133,13 @@ export async function activate(context: vscode.ExtensionContext) {
 
 
 	// Implements the `RooCodeAPI` interface.
-	const socketPath = process.env.ROO_CODE_IPC_SOCKET_PATH
+    const socketPath = process.env.KILO_IPC_SOCKET_PATH ?? process.env.ROO_CODE_IPC_SOCKET_PATH
 	const enableLogging = typeof socketPath === "string"
 }
 
 // This method is called when your extension is deactivated
 export async function deactivate() {
-	outputChannel.appendLine("Roo-Code extension deactivated")
+    outputChannel.appendLine("Kilo-Code extension deactivated")
 	// Clean up MCP server manager
 	
 	// The scheduler service will be automatically cleaned up when the extension is deactivated

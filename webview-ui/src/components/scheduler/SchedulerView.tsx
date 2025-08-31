@@ -54,22 +54,22 @@ const SchedulerView = ({ onDone }: SchedulerViewProps) => {
 	
 	// Initialize sort state from localStorage or use defaults
 	const [sortMethod, setSortMethod] = useState<SortMethod>(() => {
-		const savedMethod = localStorage.getItem('roo-sort-method');
+		const savedMethod = localStorage.getItem('kilo-sort-method');
 		return (savedMethod as SortMethod) || "created";
 	});
 	
 	const [sortDirection, setSortDirection] = useState<SortDirection>(() => {
-		const savedDirection = localStorage.getItem('roo-sort-direction');
+		const savedDirection = localStorage.getItem('kilo-sort-direction');
 		return (savedDirection as SortDirection) || "desc";
 	});
 	
 	// Save sort state to localStorage whenever it changes
 	useEffect(() => {
-		localStorage.setItem('roo-sort-method', sortMethod);
+		localStorage.setItem('kilo-sort-method', sortMethod);
 	}, [sortMethod]);
 	
 	useEffect(() => {
-		localStorage.setItem('roo-sort-direction', sortDirection);
+		localStorage.setItem('kilo-sort-direction', sortDirection);
 	}, [sortDirection]);
 	
 	// Form editing state
@@ -97,7 +97,7 @@ const SchedulerView = ({ onDone }: SchedulerViewProps) => {
 			const message = event.data;
 			
 			// Check if this is a response with file content
-			if (message.type === "fileContent" && message.path === "./.roo/schedules.json") {
+			if (message.type === "fileContent" && message.path === "./.kilo/schedules.json") {
 				try {
 					const data = JSON.parse(message.content);
 					if (data && Array.isArray(data.schedules)) {
@@ -126,7 +126,7 @@ const SchedulerView = ({ onDone }: SchedulerViewProps) => {
 		};
 	}, [])
 	
-	// Load schedules from .roo/schedules.json
+	// Load schedules from .kilo/schedules.json
 	const loadSchedules = async () => {
 		try {
 			console.log("Requesting schedules from extension")
@@ -134,7 +134,7 @@ const SchedulerView = ({ onDone }: SchedulerViewProps) => {
 			// Request the schedules file content from the extension
 			vscode.postMessage({
 				type: "openFile",
-				text: "./.roo/schedules.json",
+				text: "./.kilo/schedules.json",
 				values: { open: false }
 			})
 			
@@ -195,7 +195,7 @@ const SchedulerView = ({ onDone }: SchedulerViewProps) => {
 		// This ensures the file is written before the backend tries to read it
 		vscode.postMessage({
 		  type: "openFile",
-		  text: "./.roo/schedules.json",
+		  text: "./.kilo/schedules.json",
 		  values: {
 		    create: true,
 		    content: fileContent,
@@ -257,7 +257,7 @@ const SchedulerView = ({ onDone }: SchedulerViewProps) => {
 		// Then save to file with callback to reload schedules
 		vscode.postMessage({
 		  type: "openFile",
-		  text: "./.roo/schedules.json",
+		  text: "./.kilo/schedules.json",
 		  values: {
 		    create: true,
 		    content: fileContent,
@@ -362,7 +362,7 @@ const SchedulerView = ({ onDone }: SchedulerViewProps) => {
 												// Then save to file with callback to reload schedules
 												vscode.postMessage({
 													type: "openFile",
-													text: "./.roo/schedules.json",
+													text: "./.kilo/schedules.json",
 													values: {
 														create: true,
 														content: fileContent,

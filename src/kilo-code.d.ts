@@ -426,7 +426,7 @@ type TokenUsage = {
 	contextTokens: number
 }
 
-type RooCodeEvents = {
+type KiloCodeEvents = {
 	message: [
 		{
 			taskId: string
@@ -534,7 +534,7 @@ type RooCodeEvents = {
 /**
  * RooCodeEvent
  */
-declare enum RooCodeEventName {
+declare enum KiloCodeEventName {
 	Message = "message",
 	TaskCreated = "taskCreated",
 	TaskStarted = "taskStarted",
@@ -548,8 +548,8 @@ declare enum RooCodeEventName {
 	TaskTokenUsageUpdated = "taskTokenUsageUpdated",
 }
 
-type RooCodeSettings = GlobalSettings & ProviderSettings
-interface RooCodeAPI extends EventEmitter<RooCodeEvents> {
+type KiloCodeSettings = GlobalSettings & ProviderSettings
+interface KiloCodeAPI extends EventEmitter<KiloCodeEvents> {
 	/**
 	 * Starts a new task with an optional initial message and images.
 	 * @param task Optional initial task message.
@@ -562,7 +562,7 @@ interface RooCodeAPI extends EventEmitter<RooCodeEvents> {
 		images,
 		newTab,
 	}: {
-		configuration?: RooCodeSettings
+		configuration?: KiloCodeSettings
 		text?: string
 		images?: string[]
 		newTab?: boolean
@@ -610,12 +610,12 @@ interface RooCodeAPI extends EventEmitter<RooCodeEvents> {
 	 * Returns the current configuration.
 	 * @returns The current configuration.
 	 */
-	getConfiguration(): RooCodeSettings
+	getConfiguration(): KiloCodeSettings
 	/**
 	 * Sets the configuration for the current task.
 	 * @param values An object containing key-value pairs to set.
 	 */
-	setConfiguration(values: RooCodeSettings): Promise<void>
+	setConfiguration(values: KiloCodeSettings): Promise<void>
 	/**
 	 * Creates a new API configuration profile
 	 * @param name The name of the profile
@@ -654,9 +654,9 @@ export {
 	type ClineMessage,
 	type GlobalSettings,
 	type ProviderSettings,
-	type RooCodeAPI,
-	RooCodeEventName,
-	type RooCodeEvents,
-	type RooCodeSettings,
+	type KiloCodeAPI,
+	KiloCodeEventName,
+	type KiloCodeEvents,
+	type KiloCodeSettings,
 	type TokenUsage,
 }

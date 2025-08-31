@@ -3,7 +3,7 @@ import * as path from 'path';
 import * as vscode from 'vscode';
 import { getWorkspacePath } from '../../utils/path';
 import { fileExistsAtPath } from '../../utils/fs';
-import { RooService } from './RooService';
+import { KiloService } from './KiloService';
 
 interface Schedule {
   id: string;
@@ -29,7 +29,7 @@ interface Schedule {
   updatedAt: string;
   lastExecutionTime?: string;
   lastSkippedTime?: string; // Timestamp when execution was last skipped
-  lastTaskId?: string; // Roo Cline task ID of the last execution
+  lastTaskId?: string; // Kilo Code task ID of the last execution
   nextExecutionTime?: string; // ISO string of the next calculated execution time
 }
 
@@ -45,8 +45,8 @@ export class SchedulerService {
   private outputChannel: vscode.OutputChannel;
 
   private constructor(context: vscode.ExtensionContext) {
-    this.schedulesFilePath = path.join(getWorkspacePath(), '.roo', 'schedules.json');
-    this.outputChannel = vscode.window.createOutputChannel('Roo Scheduler');
+    this.schedulesFilePath = path.join(getWorkspacePath(), '.kilo', 'schedules.json');
+    this.outputChannel = vscode.window.createOutputChannel('Kilo Scheduler');
     context.subscriptions.push(this.outputChannel);
   }
 
@@ -103,7 +103,7 @@ export class SchedulerService {
     // Notify that schedules have been updated by triggering a command
     // This will cause the webview to refresh its data
     try {
-      await vscode.commands.executeCommand('roo-scheduler.schedulesUpdated');
+      await vscode.commands.executeCommand('kilo-scheduler.schedulesUpdated');
     } catch (error) {
       this.log(`Error notifying webview of schedule update: ${error instanceof Error ? error.message : String(error)}`);
     }
@@ -139,6 +139,8 @@ export class SchedulerService {
 
   private async saveSchedules(): Promise<void> {
     try {
+      // Ensure the .kilo directory exists
+      await fs.mkdir(path.dirname(this.schedulesFilePath), { recursive: true });
       const content = JSON.stringify({ schedules: this.schedules }, null, 2);
       await fs.writeFile(this.schedulesFilePath, content, 'utf-8');
       this.log('Schedules saved successfully');
@@ -421,7 +423,7 @@ private async executeSchedule(schedule: Schedule): Promise<void> {
   // Check if we should respect activity requirement
   if (schedule.requireActivity) {
     const lastExecutionTime = schedule.lastExecutionTime ? new Date(schedule.lastExecutionTime).getTime() : 0;
-    const lastActivityTime = await RooService.getLastActivityTime(schedule.lastTaskId)
+    const lastActivityTime = await KiloService.getLastActivityTime(schedule.lastTaskId)
     console.log('lastActivityTime', lastActivityTime);  
     console.log('lastExecutionTime', lastExecutionTime);
     if (lastActivityTime && lastActivityTime < lastExecutionTime) {
@@ -434,7 +436,7 @@ private async executeSchedule(schedule: Schedule): Promise<void> {
 
   try {
     // Check if there's an active task and handle according to taskInteraction setting
-    const hasActiveTask = await RooService.hasActiveTask();
+    const hasActiveTask = await KiloService.hasActiveTask();
     if (hasActiveTask) {
       // Default to "wait" if not specified
       const taskInteraction = schedule.taskInteraction || "wait";
@@ -447,14 +449,14 @@ private async executeSchedule(schedule: Schedule): Promise<void> {
           
           // Check if the active task has been inactive for the specified delay
           try {
-            const lastActivityTime = await RooService.getLastActivityTimeForActiveTask();
+            const lastActivityTime = await KiloService.getLastActivityTimeForActiveTask();
             const now = Date.now();
             
             if (lastActivityTime && (now - lastActivityTime) >= inactivityDelayMs) {
               // Task has been inactive for the specified delay, proceed with execution
               this.log(`Task has been inactive for ${inactivityDelayMinutes} minute(s). Proceeding with schedule "${schedule.name}".`);
               // Interrupt the inactive task
-              await RooService.interruptActiveTask();
+              await KiloService.interruptActiveTask();
             } else {
               // Task is still active or hasn't been inactive long enough
               this.log(`Task is still active or hasn't been inactive for ${inactivityDelayMinutes} minute(s). Schedule "${schedule.name}" will check again in 1 minute.`);
@@ -484,7 +486,7 @@ private async executeSchedule(schedule: Schedule): Promise<void> {
           
         case "interrupt":
           this.log(`Task already running. Schedule "${schedule.name}" will interrupt the current task.`);
-          await RooService.interruptActiveTask();
+          await KiloService.interruptActiveTask();
           break;
           
         case "skip":
@@ -526,8 +528,8 @@ private async processTask(mode: string, taskInstructions: string): Promise<strin
   console.log('in process task', mode, taskInstructions);
   try {
 
-    // Delegate to RooService for Roo Cline extension interaction and get the task ID
-    const taskId = await RooService.startTaskWithMode(mode, taskInstructions);
+    // Delegate to KiloService for Kilo Code extension interaction and get the task ID
+    const taskId = await KiloService.startTaskWithMode(mode, taskInstructions);
 
     console.log(`Successfully started task with mode "${mode}", taskId: ${taskId}`);
     return taskId;

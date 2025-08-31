@@ -2,7 +2,7 @@ import * as fs from 'fs/promises';
 import * as path from 'path';
 import * as vscode from 'vscode';
 import { getModeBySlug } from '../../../shared/modes';
-import { RooService } from '../../../services/scheduler/RooService';
+import { KiloService } from '../../../services/scheduler/KiloService';
 import { getWorkspacePath } from '../../../utils/path';
 import { fileExistsAtPath } from '../../../utils/fs';
 
@@ -14,7 +14,7 @@ jest.mock('../../../utils/path');
 jest.mock('../../../utils/fs');
 jest.mock('../../../shared/modes');
 jest.mock('vscode');
-jest.mock('../../../services/scheduler/RooService');
+jest.mock('../../../services/scheduler/KiloService');
 
 // Create a mock implementation of the SchedulerService for testing
 class MockSchedulerService {
@@ -26,7 +26,7 @@ class MockSchedulerService {
   private provider: any;
 
   private constructor(context: any) {
-    this.schedulesFilePath = path.join(getWorkspacePath(), '.roo', 'schedules.json');
+    this.schedulesFilePath = path.join(getWorkspacePath(), '.kilo', 'schedules.json');
     this.outputChannel = {
       appendLine: jest.fn(),
       dispose: jest.fn()
@@ -237,8 +237,8 @@ class MockSchedulerService {
     // Check if we should respect activity requirement
 
     // Check for active task and handle skip logic
-    if (typeof RooService.hasActiveTask === "function" && schedule.taskInteraction === "skip") {
-      const hasActive = await RooService.hasActiveTask();
+    if (typeof KiloService.hasActiveTask === "function" && schedule.taskInteraction === "skip") {
+      const hasActive = await KiloService.hasActiveTask();
       if (hasActive) {
         // Update lastSkippedTime and call updateSchedule
         const lastSkippedTime = new Date().toISOString();
@@ -279,9 +279,9 @@ class MockSchedulerService {
         throw new Error(`Invalid mode: ${mode}`);
       }
 
-      // Call RooService.startTaskWithMode and propagate errors
-      if (typeof RooService.startTaskWithMode === "function") {
-        const taskId = await RooService.startTaskWithMode(mode, taskInstructions);
+      // Call KiloService.startTaskWithMode and propagate errors
+      if (typeof KiloService.startTaskWithMode === "function") {
+        const taskId = await KiloService.startTaskWithMode(mode, taskInstructions);
         this.log(`Successfully started task with mode "${mode}"`);
         return taskId;
       }
@@ -335,7 +335,7 @@ class MockSchedulerService {
 
 describe('SchedulerService', () => {
   // Mock data
-  const mockSchedulesFilePath = '/mock/path/.roo/schedules.json';
+  const mockSchedulesFilePath = '/mock/path/.kilo/schedules.json';
   const mockWorkspacePath = '/mock/path';
   
   // Sample schedules for testing
@@ -515,8 +515,8 @@ describe('SchedulerService', () => {
     // Mock getModeBySlug
     (getModeBySlug as jest.Mock).mockReturnValue({ slug: 'code', name: 'Code' });
 
-    // Mock RooService
-    mockStartTaskWithMode = jest.spyOn(RooService, 'startTaskWithMode').mockResolvedValue("mock-task-id");
+    // Mock KiloService
+    mockStartTaskWithMode = jest.spyOn(KiloService, 'startTaskWithMode').mockResolvedValue("mock-task-id");
 
     // Mock context
     mockContext = {
@@ -1132,7 +1132,7 @@ describe('SchedulerService', () => {
       // Execute the expired schedule
       await schedulerService.executeSchedule(expiredSchedule);
       
-      // Verify that RooService.startTaskWithMode was NOT called
+      // Verify that KiloService.startTaskWithMode was NOT called
       expect(mockStartTaskWithMode).not.toHaveBeenCalled();
       
       // Restore the original method
@@ -1150,7 +1150,7 @@ describe('SchedulerService', () => {
       const dailySchedule = sampleSchedules.schedules[0];
       await schedulerService.executeSchedule(dailySchedule);
 
-      // Verify that RooService.startTaskWithMode was called with correct parameters
+      // Verify that KiloService.startTaskWithMode was called with correct parameters
       expect(mockStartTaskWithMode).toHaveBeenCalledWith(
         dailySchedule.mode,
         dailySchedule.taskInstructions
@@ -1177,8 +1177,8 @@ describe('SchedulerService', () => {
       // Mock fs.writeFile
       (fs.writeFile as any).mockResolvedValue(undefined);
       
-      // Mock RooService.hasActiveTask to return true (task already running)
-      jest.spyOn(RooService, 'hasActiveTask').mockResolvedValue(true);
+      // Mock KiloService.hasActiveTask to return true (task already running)
+      jest.spyOn(KiloService, 'hasActiveTask').mockResolvedValue(true);
       
       // Create a schedule with "skip" taskInteraction
       const skipSchedule = {
@@ -1194,7 +1194,7 @@ describe('SchedulerService', () => {
       // Execute the schedule
       await schedulerService.executeSchedule(skipSchedule);
       
-      // Verify that RooService.startTaskWithMode was NOT called (task was skipped)
+      // Verify that KiloService.startTaskWithMode was NOT called (task was skipped)
       expect(mockStartTaskWithMode).not.toHaveBeenCalled();
       
       // Verify that updateSchedule was called with lastSkippedTime
@@ -1220,37 +1220,38 @@ describe('SchedulerService', () => {
       await expect(schedulerService.processTask('invalid-mode', 'Test task instructions')).rejects.toThrow('Invalid mode');
     });
 
-    it('should throw error if RooService throws (extension not active)', async () => {
+    it('should throw error if KiloService throws (extension not active)', async () => {
       // Mock getModeBySlug to return a valid mode
       (getModeBySlug as jest.Mock).mockReturnValue({ slug: 'code', name: 'Code' });
 
-      // Mock RooService to throw
+      // Mock KiloService to throw
       mockStartTaskWithMode.mockRejectedValueOnce(new Error('Roo Cline extension is not activated'));
 
       // Expect processTask to throw error for inactive extension
       await expect(schedulerService.processTask('code', 'Test task instructions')).rejects.toThrow('Roo Cline extension is not activated');
     });
 
-    it('should throw error if RooService throws (API not available)', async () => {
+    it('should throw error if KiloService throws (API not available)', async () => {
       // Mock getModeBySlug to return a valid mode
       (getModeBySlug as jest.Mock).mockReturnValue({ slug: 'code', name: 'Code' });
 
-      // Mock RooService to throw
+      // Mock KiloService to throw
       mockStartTaskWithMode.mockRejectedValueOnce(new Error('Roo Cline API is not available'));
 
       // Expect processTask to throw error for unavailable API
       await expect(schedulerService.processTask('code', 'Test task instructions')).rejects.toThrow('Roo Cline API is not available');
     });
 
-    it('should call RooService.startTaskWithMode with correct parameters', async () => {
+    it('should call KiloService.startTaskWithMode with correct parameters', async () => {
       // Mock getModeBySlug to return a valid mode
       (getModeBySlug as jest.Mock).mockReturnValue({ slug: 'code', name: 'Code' });
 
       // Call processTask
       await schedulerService.processTask('code', 'Test task instructions');
 
-      // Verify that RooService.startTaskWithMode was called with correct parameters
+      // Verify that KiloService.startTaskWithMode was called with correct parameters
       expect(mockStartTaskWithMode).toHaveBeenCalledWith('code', 'Test task instructions');
     });
   });
 });
+
