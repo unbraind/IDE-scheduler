@@ -1,742 +1,1236 @@
 {
-	"name": "agent-scheduler",
-	"displayName": "Agent Scheduler",
-	"description": "A task scheduler for Kilo Code",
-	"publisher": "unbrained",
-	"version": "0.0.18",
-	"icon": "assets/icons/scheduler-icon-light.png",
-	"galleryBanner": {
-		"color": "#617A91",
-		"theme": "dark"
-	},
-	"engines": {
-		"vscode": "^1.84.0",
-		"node": "20.18.1"
-	},
-	"author": {
-		"name": "Stefan Preu",
-		"url": "https://github.com/unbraind"
-	},
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/unbrained/IDE-scheduler"
-	},
-	"homepage": "https://github.com/unbrained/IDE-scheduler",
-	"categories": [
-		"AI",
-		"Chat",
-		"Programming Languages",
-		"Education",
-		"Snippets",
-		"Testing"
-	],
-	"keywords": [
-		"claude",
-		"dev",
-		"mcp",
-		"openrouter",
-		"coding",
-		"agent",
-		"autonomous",
-		"chatgpt",
-		"sonnet",
-		"ai",
-		"llama",
-		"scheduler",
-		"kilo",
-		"kilo-code",
-		"kilo-scheduler"
-	],
-	"activationEvents": [
-		"onLanguage",
-		"onStartupFinished"
-	],
-	"main": "./dist/extension.js",
-	"extensionDependencies": [
-		"kilocode.kilo-code"
-	],
-	"contributes": {
-		"configuration": {
-			"title": "Agent Scheduler",
-			"properties": {
-				"kilo-scheduler.experimental.activityBadge": {
-					"type": "boolean",
-					"default": false,
-					"description": "Experimental: show the number of active schedules as a badge on the Kilo Scheduler Activity Bar icon.",
-					"kilo-scheduler.experimental.crossIde": {
-						"type": "boolean",
-						"default": false,
-						"description": "Experimental (WIP): Enable cross-IDE scheduling interface + Agent-to-Agent trigger support. Very early WIP (cline, roo-code, Continue, Cursor, Claude Code, Gemini CLI, Qwen Coder CLI)."
-					},
-					"kilo-scheduler.experimental.agents.kilocode.enabled": {
-						"type": "boolean",
-						"default": true,
-						"description": "Enable Kilo Code adapter (experimental cross-IDE)."
-					},
-					"kilo-scheduler.experimental.agents.kilocode.allowedActions": {
-						"type": "array",
-						"description": "Allowed A2A actions for Kilo Code adapter.",
-						"items": {
-							"type": "string",
-							"enum": [
-								"trigger",
-								"list",
-								"setActive"
-							]
-						},
-						"default": [
-							"trigger",
-							"list",
-							"setActive"
-						]
-					},
-					"kilo-scheduler.experimental.agents.cline.enabled": {
-						"type": "boolean",
-						"default": false,
-						"description": "Enable Cline adapter (experimental cross-IDE)."
-					},
-					"kilo-scheduler.experimental.agents.cline.allowedActions": {
-						"type": "array",
-						"description": "Allowed A2A actions for Cline adapter.",
-						"items": {
-							"type": "string",
-							"enum": [
-								"trigger",
-								"list",
-								"setActive"
-							]
-						},
-						"default": [
-							"trigger"
-						]
-					},
-					"kilo-scheduler.experimental.agents.rooCode.enabled": {
-						"type": "boolean",
-						"default": false,
-						"description": "Enable Roo Code adapter (experimental cross-IDE)."
-					},
-					"kilo-scheduler.experimental.agents.rooCode.allowedActions": {
-						"type": "array",
-						"description": "Allowed A2A actions for Roo Code adapter.",
-						"items": {
-							"type": "string",
-							"enum": [
-								"trigger",
-								"list",
-								"setActive"
-							]
-						},
-						"default": [
-							"trigger"
-						]
-					},
-					"kilo-scheduler.experimental.agents.continue.enabled": {
-						"type": "boolean",
-						"default": false,
-						"description": "Enable Continue adapter (experimental cross-IDE)."
-					},
-					"kilo-scheduler.experimental.agents.continue.allowedActions": {
-						"type": "array",
-						"description": "Allowed A2A actions for Continue adapter.",
-						"items": {
-							"type": "string",
-							"enum": [
-								"trigger",
-								"list",
-								"setActive"
-							]
-						},
-						"default": [
-							"trigger"
-						]
-					},
-					"kilo-scheduler.experimental.agents.cursor.enabled": {
-						"type": "boolean",
-						"default": false,
-						"description": "Enable Cursor adapter (experimental cross-IDE)."
-					},
-					"kilo-scheduler.experimental.agents.cursor.allowedActions": {
-						"type": "array",
-						"description": "Allowed A2A actions for Cursor adapter.",
-						"items": {
-							"type": "string",
-							"enum": [
-								"trigger",
-								"list",
-								"setActive"
-							]
-						},
-						"default": [
-							"trigger"
-						]
-					},
-					"kilo-scheduler.experimental.agents.claudeCode.enabled": {
-						"type": "boolean",
-						"default": false,
-						"description": "Enable Claude Code adapter (experimental cross-IDE)."
-					},
-					"kilo-scheduler.experimental.agents.claudeCode.allowedActions": {
-						"type": "array",
-						"description": "Allowed A2A actions for Claude Code adapter.",
-						"items": {
-							"type": "string",
-							"enum": [
-								"trigger",
-								"list",
-								"setActive"
-							]
-						},
-						"default": [
-							"trigger"
-						]
-					},
-					"kilo-scheduler.experimental.agents.geminiCli.enabled": {
-						"type": "boolean",
-						"default": false,
-						"description": "Enable Google Gemini CLI adapter (experimental cross-IDE)."
-					},
-					"kilo-scheduler.experimental.agents.geminiCli.allowedActions": {
-						"type": "array",
-						"description": "Allowed A2A actions for Gemini CLI adapter.",
-						"items": {
-							"type": "string",
-							"enum": [
-								"trigger",
-								"list",
-								"setActive"
-							]
-						},
-						"default": [
-							"trigger"
-						]
-					},
-					"kilo-scheduler.experimental.agents.qwenCli.enabled": {
-						"type": "boolean",
-						"default": false,
-						"description": "Enable Qwen Coder CLI adapter (experimental cross-IDE)."
-					},
-					"kilo-scheduler.experimental.agents.qwenCli.allowedActions": {
-						"type": "array",
-						"description": "Allowed A2A actions for Qwen CLI adapter.",
-						"items": {
-							"type": "string",
-							"enum": [
-								"trigger",
-								"list",
-								"setActive"
-							]
-						},
-						"default": [
-							"trigger"
-						]
-					},
-					"agent-scheduler.experimental.activityBadge": {
-						"type": "boolean",
-						"default": false,
-						"description": "Experimental: show the number of active schedules as a badge on the Agent Scheduler Activity Bar icon."
-					},
-				"agent-scheduler.experimental.crossIde": {
-					"type": "boolean",
-					"default": false,
-					"description": "Experimental (WIP): Enable cross-IDE scheduling interface + Agent-to-Agent trigger support."
-				},
-				"agent-scheduler.experimental.autoMapOnStartup": {
-					"type": "boolean",
-					"default": true,
-					"description": "On activation, discover installed agent extensions and prefill trigger/list commands when missing."
-				},
-					"agent-scheduler.experimental.mcp.enabled": {
-						"type": "boolean",
-						"default": false,
-						"description": "Enable MCP integration for forwarding/receiving A2A messages (experimental)."
-					},
-					"agent-scheduler.experimental.mcp.forward": {
-						"type": "boolean",
-						"default": false,
-						"description": "Forward A2A trigger messages over MCP when enabled."
-					},
-					"agent-scheduler.experimental.mcp.endpoint": {
-						"type": "string",
-						"default": "",
-						"description": "MCP endpoint to send A2A messages to (SDK-dependent)."
-					},
-					"agent-scheduler.experimental.mcp.http.enabled": {
-						"type": "boolean",
-						"default": false,
-						"description": "Start a local MCP HTTP endpoint for tools (experimental)."
-					},
-					"agent-scheduler.experimental.mcp.http.port": {
-						"type": "number",
-						"default": 4025,
-						"description": "Port for the local MCP HTTP endpoint."
-					},
-					"agent-scheduler.experimental.mcp.http.path": {
-						"type": "string",
-						"default": "/mcp",
-					"description": "Base path for the MCP HTTP endpoint."
-				},
-				"agent-scheduler.experimental.auth.http.required": {
-					"type": "boolean",
-					"default": false,
-					"description": "Require an access key for HTTP A2A endpoints. Manage keys via commands: Create/List/Revoke/Toggle Access Key."
-				},
-				"agent-scheduler.experimental.auth.grpc.required": {
-					"type": "boolean",
-					"default": false,
-					"description": "Require an access key for gRPC A2A endpoints. Clients must send 'authorization: Bearer <key>' or 'x-agent-key' metadata."
-				},
-				"agent-scheduler.experimental.auth.mcp.required": {
-					"type": "boolean",
-					"default": false,
-					"description": "Require an access key for MCP HTTP endpoint. Clients must include 'Authorization: Bearer <key>' or 'x-agent-key' header."
-				},
-					"agent-scheduler.experimental.grpc.enabled": {
-						"type": "boolean",
-						"default": false,
-						"description": "Enable built-in A2A gRPC server (experimental)."
-					},
-					"agent-scheduler.experimental.grpc.host": {
-						"type": "string",
-						"default": "127.0.0.1",
-						"description": "Host/interface on which to bind the A2A gRPC server."
-					},
-					"agent-scheduler.experimental.grpc.port": {
-						"type": "number",
-						"default": 50251,
-						"description": "Port on which to bind the A2A gRPC server."
-					},
-					"agent-scheduler.experimental.grpc.client.enabled": {
-						"type": "boolean",
-						"default": false,
-						"description": "Enable A2A gRPC client for outbound messages."
-					},
-					"agent-scheduler.experimental.grpc.client.target": {
-						"type": "string",
-						"default": "127.0.0.1:50251",
-						"description": "Target host:port of remote A2A gRPC server."
-					},
-					"agent-scheduler.experimental.agents.kilocode.enabled": {
-						"type": "boolean",
-						"default": true,
-						"description": "Enable Kilo Code adapter (experimental cross-IDE)."
-					},
-				"agent-scheduler.experimental.agents.kilocode.allowedActions": {
-					"type": "array",
-					"description": "Allowed A2A actions for Kilo Code adapter.",
-					"items": {
-						"type": "string",
-						"enum": [
-							"trigger",
-							"list",
-							"setActive",
-							"message",
-							"task.create",
-							"task.get",
-							"task.list",
-							"task.cancel"
-						]
-					},
-					"default": [
-						"trigger",
-						"list",
-						"setActive",
-						"message",
-						"task.create",
-						"task.get",
-						"task.list",
-						"task.cancel"
-					]
-				},
-					"agent-scheduler.experimental.agents.cline.enabled": {
-						"type": "boolean",
-						"default": false,
-						"description": "Enable Cline adapter (experimental cross-IDE)."
-					},
-					"agent-scheduler.experimental.agents.cline.allowedActions": {
-						"type": "array",
-						"description": "Allowed A2A actions for Cline adapter.",
-						"items": {
-							"type": "string",
-							"enum": [
-								"trigger",
-								"list",
-								"setActive"
-							]
-						},
-						"default": [
-							"trigger"
-						]
-					},
-					"agent-scheduler.experimental.agents.cline.triggerCommand": {
-						"type": "string",
-						"default": "cline.newTask",
-						"description": "Override command id to trigger Cline (auto-discovered when possible)."
-					},
-					"agent-scheduler.experimental.agents.cline.listCommand": {
-						"type": "string",
-						"default": "",
-						"description": "Optional command id to list Cline schedules/tasks (if provided by the extension)."
-					},
-					"agent-scheduler.experimental.agents.rooCode.triggerCommand": {
-						"type": "string",
-						"default": "",
-						"description": "Override command id to trigger Roo Code (auto-discovered when possible)."
-					},
-					"agent-scheduler.experimental.agents.rooCode.listCommand": {
-						"type": "string",
-						"default": "",
-						"description": "Optional command id to list Roo Code schedules/tasks."
-					},
-					"agent-scheduler.experimental.agents.continue.triggerCommand": {
-						"type": "string",
-						"default": "",
-						"description": "Override command id to trigger Continue."
-					},
-					"agent-scheduler.experimental.agents.continue.listCommand": {
-						"type": "string",
-						"default": "",
-						"description": "Optional command id to list Continue tasks/history."
-					},
-					"agent-scheduler.experimental.agents.cursor.triggerCommand": {
-						"type": "string",
-						"default": "",
-						"description": "Override command id to trigger Cursor."
-					},
-					"agent-scheduler.experimental.agents.cursor.listCommand": {
-						"type": "string",
-						"default": "",
-						"description": "Optional command id to list Cursor tasks/history."
-					},
-					"agent-scheduler.experimental.agents.claudeCode.triggerCommand": {
-						"type": "string",
-						"default": "",
-						"description": "Override command id to trigger Claude Code."
-					},
-					"agent-scheduler.experimental.agents.claudeCode.listCommand": {
-						"type": "string",
-						"default": "",
-						"description": "Optional command id to list Claude Code tasks/history."
-					},
-					"agent-scheduler.experimental.agents.geminiCli.triggerCommand": {
-						"type": "string",
-						"default": "",
-						"description": "Override command id to trigger Google Gemini CLI."
-					},
-					"agent-scheduler.experimental.agents.geminiCli.listCommand": {
-						"type": "string",
-						"default": "",
-						"description": "Optional command id to list Gemini CLI tasks/history."
-					},
-					"agent-scheduler.experimental.agents.qwenCli.triggerCommand": {
-						"type": "string",
-						"default": "",
-						"description": "Override command id to trigger Qwen Coder CLI."
-					},
-					"agent-scheduler.experimental.agents.qwenCli.listCommand": {
-						"type": "string",
-						"default": "",
-						"description": "Optional command id to list Qwen Coder CLI tasks/history."
-					},
-					"agent-scheduler.experimental.agents.copilot.enabled": {
-						"type": "boolean",
-						"default": false,
-						"description": "Enable GitHub Copilot adapter (experimental cross-IDE)."
-					},
-					"agent-scheduler.experimental.agents.copilot.allowedActions": {
-						"type": "array",
-						"items": {
-							"type": "string",
-							"enum": [
-								"trigger",
-								"list"
-							]
-						},
-						"default": [
-							"trigger"
-						]
-					},
-					"agent-scheduler.experimental.agents.copilot.triggerCommand": {
-						"type": "string",
-						"default": "",
-						"description": "Override command id to trigger Copilot (e.g., open chat)."
-					},
-					"agent-scheduler.experimental.agents.amazonQ.enabled": {
-						"type": "boolean",
-						"default": false,
-						"description": "Enable Amazon Q adapter (experimental cross-IDE)."
-					},
-					"agent-scheduler.experimental.agents.amazonQ.allowedActions": {
-						"type": "array",
-						"items": {
-							"type": "string",
-							"enum": [
-								"trigger",
-								"list"
-							]
-						},
-						"default": [
-							"trigger"
-						]
-					},
-					"agent-scheduler.experimental.agents.amazonQ.triggerCommand": {
-						"type": "string",
-						"default": "",
-						"description": "Override command id to trigger Amazon Q."
-					}
-				}
-			}
-		},
-		"viewsContainers": {
-			"activitybar": [
-				{
-					"id": "agent-scheduler-ActivityBar",
-					"title": "Agent Scheduler",
-					"icon": {
-						"light": "assets/icons/scheduler-icon-light.png",
-						"dark": "assets/icons/scheduler-icon-dark.png"
-					}
-				}
-			]
-		},
-		"views": {
-			"agent-scheduler-ActivityBar": [
-				{
-					"type": "webview",
-					"id": "agent-scheduler.SidebarProvider",
-					"name": ""
-				}
-			]
-		},
-		"commands": [
-			{
-				"command": "agent-scheduler.reloadWindowDev",
-				"title": "Reload Window (Dev Only)",
-				"icon": "$(refresh)",
-				"category": "Developer"
-			},
-			{
-				"command": "agent-scheduler.openAgentScheduler",
-				"title": "Open Agent Scheduler",
-				"icon": {
-					"light": "assets/icons/scheduler-icon-light.png",
-					"dark": "assets/icons/scheduler-icon-dark.png"
-				}
-			},
-			{
-				"command": "agent-scheduler.a2a.trigger",
-				"title": "AgentScheduler: A2A Trigger (Experimental)",
-				"category": "Agent Scheduler"
-			},
-			{
-				"command": "agent-scheduler.a2a.sample",
-				"title": "AgentScheduler: Sample A2A Trigger",
-				"category": "Agent Scheduler"
-			},
-			{
-				"command": "agent-scheduler.grpc.invoke",
-				"title": "AgentScheduler: gRPC A2A Invoke (Experimental)",
-				"category": "Agent Scheduler"
-			},
-			{
-				"command": "agent-scheduler.exportAgentCard",
-				"title": "AgentScheduler: Export Agent Card (Discovery)",
-				"category": "Agent Scheduler"
-			},
-			{
-				"command": "agent-scheduler.mapAgentCommands",
-				"title": "AgentScheduler: Map Agent Commands (Discover & Persist)",
-				"category": "Agent Scheduler"
-			},
-			{
-				"command": "agent-scheduler.auth.createKey",
-				"title": "AgentScheduler: Create Access Key",
-				"category": "Agent Scheduler"
-			},
-			{
-				"command": "agent-scheduler.auth.listKeys",
-				"title": "AgentScheduler: List Access Keys",
-				"category": "Agent Scheduler"
-			},
-			{
-				"command": "agent-scheduler.auth.revokeKey",
-				"title": "AgentScheduler: Revoke Access Key",
-				"category": "Agent Scheduler"
-			},
-			{
-				"command": "agent-scheduler.auth.toggleKey",
-				"title": "AgentScheduler: Toggle Access Key Enabled",
-				"category": "Agent Scheduler"
-			}
-		],
-		"menus": {
-			"view/title": [
-				{
-					"command": "agent-scheduler.reloadWindowDev",
-					"group": "navigation@0",
-					"when": "view == agent-scheduler.SidebarProvider && kiloSchedulerDevMode"
-				},
-				{
-					"command": "agent-scheduler.openAgentScheduler",
-					"group": "navigation@1",
-					"when": "view == agent-scheduler.SidebarProvider"
-				}
-			]
-		}
-	},
-	"scripts": {
-		"build": "npm run vsix",
-		"build:webview": "cd webview-ui && npm run build",
-		"build:esbuild": "node esbuild.js --production",
-		"compile": "tsc -p . --outDir out && node esbuild.js",
-		"install:all": "npm install npm-run-all && npm-run-all -l -p install-*",
-		"install-extension": "npm install",
-		"install-webview": "cd webview-ui && npm install",
-		"install-e2e": "cd e2e && npm install",
-		"lint": "npm-run-all -l -p lint:*",
-		"lint:extension": "eslint src --ext ts",
-		"lint:webview": "cd webview-ui && npm run lint",
-		"lint:e2e": "cd e2e && npm run lint",
-		"check-types": "npm-run-all -l -p check-types:*",
-		"check-types:extension": "tsc --noEmit",
-		"check-types:webview": "cd webview-ui && npm run check-types",
-		"check-types:e2e": "cd e2e && npm run check-types",
-		"package": "npm-run-all -l -p build:webview build:esbuild check-types lint",
-		"pretest": "npm run compile",
-		"dev": "cd webview-ui && npm run dev",
-		"test": "npm run test:extension && npm run test:webview",
-		"test:extension": "jest",
-		"test:webview": "cd webview-ui && npm run test",
-		"test:e2e": "npm run vscode-test && cd e2e && npm run test",
-		"test:kiloservice": "npm run vscode-test && cd e2e && npm run test:kiloservice",
-		"test:e2e:all": "npm run vscode-test && cd e2e && npm run test:all",
-		"prepare": "husky",
-		"publish:marketplace": "vsce publish && ovsx publish",
-		"publish": "npm run build && changeset publish && npm install --package-lock-only",
-		"version-packages": "changeset version && npm install --package-lock-only",
-		"vscode:prepublish": "npm run build:webview && npm run build:esbuild",
-		"vsix": "rimraf bin && mkdirp bin && npx vsce package --out bin",
-		"watch": "npm-run-all -l -p watch:*",
-		"watch:esbuild": "node esbuild.js --watch",
-		"watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
-		"watch-tests": "tsc -p . -w --outDir out",
-		"changeset": "changeset",
-		"knip": "knip --include files",
-		"clean": "npm-run-all -l -p clean:*",
-		"clean:extension": "rimraf bin dist out",
-		"clean:webview": "cd webview-ui && npm run clean",
-		"clean:e2e": "cd e2e && npm run clean",
-		"vscode-test": "npm-run-all -l -p vscode-test:*",
-		"vscode-test:extension": "tsc -p . --outDir out && node esbuild.js",
-		"vscode-test:webview": "cd webview-ui && npm run build",
-		"update-contributors": "node scripts/update-contributors.js",
-		"generate-types": "tsx scripts/generate-types.mts"
-	},
-	"dependencies": {
-		"@anthropic-ai/bedrock-sdk": "^0.12.5",
-		"@anthropic-ai/sdk": "^0.37.0",
-		"@anthropic-ai/vertex-sdk": "^0.7.0",
-		"@aws-sdk/client-bedrock-runtime": "^3.817.0",
-		"@genkit-ai/mcp": "^1.18.0",
-		"@google-cloud/vertexai": "^1.9.3",
-		"@google/generative-ai": "^0.18.0",
-		"@grpc/grpc-js": "^1.11.3",
-		"@grpc/proto-loader": "^0.7.13",
-		"@mistralai/mistralai": "^1.3.6",
-		"@modelcontextprotocol/sdk": "^1.7.0",
-		"@types/clone-deep": "^4.0.4",
-		"@types/pdf-parse": "^1.1.4",
-		"@types/tmp": "^0.2.6",
-		"@types/turndown": "^5.0.5",
-		"@types/vscode": "^1.95.0",
-		"@vscode/codicons": "^0.0.36",
-		"axios": "^1.7.4",
-		"cheerio": "^1.0.0",
-		"chokidar": "^4.0.1",
-		"clone-deep": "^4.0.1",
-		"default-shell": "^2.2.0",
-		"delay": "^6.0.0",
-		"diff": "^7.0.0",
-		"diff-match-patch": "^1.0.5",
-		"fast-deep-equal": "^3.1.3",
-		"fast-xml-parser": "^4.5.1",
-		"fastest-levenshtein": "^1.0.16",
-		"fzf": "^0.5.2",
-		"get-folder-size": "^5.0.0",
-		"globby": "^14.0.2",
-		"i18next": "^24.2.2",
-		"isbinaryfile": "^5.0.2",
-		"js-tiktoken": "^1.0.19",
-		"mammoth": "^1.8.0",
-		"monaco-vscode-textmate-theme-converter": "^0.1.7",
-		"node-ipc": "^12.0.0",
-		"openai": "^4.78.1",
-		"os-name": "^6.0.0",
-		"p-wait-for": "^5.0.2",
-		"pdf-parse": "^1.1.1",
-		"pkce-challenge": "^4.1.0",
-		"posthog-node": "^4.7.0",
-		"pretty-bytes": "^6.1.1",
-		"puppeteer-chromium-resolver": "^23.0.0",
-		"puppeteer-core": "^23.4.0",
-		"reconnecting-eventsource": "^1.6.4",
-		"say": "^0.16.0",
-		"serialize-error": "^12.0.0",
-		"simple-git": "^3.27.0",
-		"sound-play": "^1.1.0",
-		"string-similarity": "^4.0.4",
-		"strip-ansi": "^7.1.0",
-		"strip-bom": "^5.0.0",
-		"tmp": "^0.2.3",
-		"turndown": "^7.2.0",
-		"zod": "^3.23.8"
-	},
-	"devDependencies": {
-		"@changesets/cli": "^2.27.10",
-		"@changesets/types": "^6.0.0",
-		"@dotenvx/dotenvx": "^1.41.0",
-		"@types/debug": "^4.1.12",
-		"@types/diff": "^7.0.2",
-		"@types/diff-match-patch": "^1.0.36",
-		"@types/glob": "^8.1.0",
-		"@types/jest": "^29.5.14",
-		"@types/node": "20.x",
-		"@types/node-ipc": "^9.2.3",
-		"@types/string-similarity": "^4.0.2",
-		"@typescript-eslint/eslint-plugin": "^8.30.1",
-		"@typescript-eslint/parser": "^8.32.1",
-		"@vscode/vsce": "^3.3.2",
-		"esbuild": "^0.25.2",
-		"eslint": "^9.25.1",
-		"execa": "^9.5.2",
-		"glob": "^11.0.1",
-		"husky": "^9.1.7",
-		"jest": "^29.7.0",
-		"jest-environment-jsdom": "^29.7.0",
-		"jest-simple-dot-reporter": "^1.0.5",
-		"knip": "^5.44.4",
-		"lint-staged": "^15.2.11",
-		"mkdirp": "^3.0.1",
-		"npm-run-all": "^4.1.5",
-		"prettier": "^3.5.3",
-		"rimraf": "^6.0.1",
-		"ts-jest": "^29.2.5",
-		"tsup": "^8.4.0",
-		"tsx": "^4.19.3",
-		"typescript": "^5.4.5",
-		"zod-to-ts": "^1.2.0"
-	},
-	"lint-staged": {
-		"*.{js,jsx,ts,tsx,json,css,md}": [
-			"prettier --write"
-		],
-		"src/**/*.{ts,tsx}": [
-			"npx eslint -c .eslintrc.json --max-warnings=0 --fix"
-		],
-		"webview-ui/**/*.{ts,tsx}": [
-			"npx eslint -c webview-ui/.eslintrc.json --max-warnings=0 --fix"
-		]
-	}
+  "name": "agent-scheduler",
+  "displayName": "Agent Scheduler",
+  "description": "A task scheduler for Kilo Code",
+  "publisher": "unbrained",
+  "version": "0.0.19",
+  "icon": "assets/icons/scheduler-icon-market.png",
+  "homepage": "https://github.com/unbrained/IDE-scheduler",
+  "galleryBanner": {
+    "color": "#617A91",
+    "theme": "dark"
+  },
+  "engines": {
+    "vscode": "^1.84.0",
+    "node": "20.18.1"
+  },
+  "author": {
+    "name": "Stefan Preu",
+    "url": "https://github.com/unbraind"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/unbrained/IDE-scheduler"
+  },
+  "categories": [
+    "AI",
+    "Chat",
+    "Programming Languages",
+    "Education",
+    "Snippets",
+    "Testing"
+  ],
+  "keywords": [
+    "claude",
+    "dev",
+    "mcp",
+    "openrouter",
+    "coding",
+    "agent",
+    "autonomous",
+    "chatgpt",
+    "sonnet",
+    "ai",
+    "llama",
+    "scheduler",
+    "kilo",
+    "kilo-code",
+    "kilo-scheduler"
+  ],
+  "activationEvents": [
+    "onStartupFinished",
+    "onView:agent-scheduler.SidebarProvider",
+    "onCommand:agent-scheduler.openAgentScheduler"
+  ],
+  "main": "./dist/extension.js",
+  "extensionDependencies": [
+    "kilocode.kilo-code"
+  ],
+  "contributes": {
+    "configuration": {
+      "title": "Agent Scheduler",
+      "properties": {
+        "agent-scheduler.experimental.activityBadge": {
+          "type": "boolean",
+          "default": false,
+          "description": "Show active schedule count on Activity Bar icon (experimental)."
+        },
+        "agent-scheduler.experimental.crossIde": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable cross-IDE scheduling + Agent-to-Agent triggers (experimental)."
+        },
+        "agent-scheduler.experimental.autoMapOnStartup": {
+          "type": "boolean",
+          "default": true,
+          "description": "On activation, discover installed agent extensions and prefill trigger/list commands when missing."
+        },
+        "agent-scheduler.experimental.http.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable built-in HTTP A2A endpoint."
+        },
+        "agent-scheduler.experimental.http.host": {
+          "type": "string",
+          "default": "127.0.0.1",
+          "description": "HTTP host/interface for A2A endpoint."
+        },
+        "agent-scheduler.experimental.http.port": {
+          "type": "number",
+          "default": 50252,
+          "description": "HTTP port for A2A endpoint."
+        },
+        "agent-scheduler.experimental.http.basePath": {
+          "type": "string",
+          "default": "/a2a",
+          "description": "Base path for HTTP A2A endpoint."
+        },
+        "agent-scheduler.experimental.grpc.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable built-in gRPC A2A server."
+        },
+        "agent-scheduler.experimental.grpc.host": {
+          "type": "string",
+          "default": "127.0.0.1",
+          "description": "gRPC host/interface for A2A server."
+        },
+        "agent-scheduler.experimental.grpc.port": {
+          "type": "number",
+          "default": 50251,
+          "description": "gRPC port for A2A server."
+        },
+        "agent-scheduler.experimental.grpc.client.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable gRPC client for outbound A2A calls."
+        },
+        "agent-scheduler.experimental.grpc.client.target": {
+          "type": "string",
+          "default": "127.0.0.1:50251",
+          "description": "gRPC client target host:port."
+        },
+        "agent-scheduler.experimental.mcp.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable MCP integration (experimental)."
+        },
+        "agent-scheduler.experimental.mcp.forward": {
+          "type": "boolean",
+          "default": false,
+          "description": "Forward A2A trigger messages over MCP when enabled."
+        },
+        "agent-scheduler.experimental.mcp.endpoint": {
+          "type": "string",
+          "default": "",
+          "description": "MCP endpoint URL for outbound messages."
+        },
+        "agent-scheduler.experimental.mcp.http.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Expose MCP HTTP transport (local)."
+        },
+        "agent-scheduler.experimental.mcp.http.port": {
+          "type": "number",
+          "default": 4025,
+          "description": "Port for MCP HTTP endpoint."
+        },
+        "agent-scheduler.experimental.mcp.http.path": {
+          "type": "string",
+          "default": "/mcp",
+          "description": "Base path for MCP HTTP endpoint."
+        },
+        "agent-scheduler.experimental.auth.http.required": {
+          "type": "boolean",
+          "default": false,
+          "description": "Require an access key for HTTP A2A endpoints."
+        },
+        "agent-scheduler.experimental.auth.grpc.required": {
+          "type": "boolean",
+          "default": false,
+          "description": "Require an access key for gRPC A2A server."
+        },
+        "agent-scheduler.experimental.auth.mcp.required": {
+          "type": "boolean",
+          "default": false,
+          "description": "Require an access key for MCP HTTP endpoint."
+        },
+        "agent-scheduler.experimental.dspy.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable DSPy optimization commands for coding prompts (experimental)."
+        },
+        "agent-scheduler.experimental.dspy.pythonPath": {
+          "type": "string",
+          "default": "",
+          "description": "Path to Python interpreter with dspy installed (default: python3)."
+        },
+        "agent-scheduler.experimental.dspy.optimizer": {
+          "type": "string",
+          "default": "mipro",
+          "description": "DSPy optimizer to use (mipro or gepa)."
+        },
+        "agent-scheduler.experimental.dspy.model": {
+          "type": "string",
+          "default": "gpt-4o-mini",
+          "description": "Default LLM model id for DSPy (when supported)."
+        },
+        "agent-scheduler.experimental.agents.kilocode.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable kilocode adapter."
+        },
+        "agent-scheduler.experimental.agents.kilocode.allowedActions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "trigger",
+              "list",
+              "setActive",
+              "message",
+              "task.create",
+              "task.get",
+              "task.list",
+              "task.cancel"
+            ]
+          },
+          "default": [
+            "trigger",
+            "list",
+            "setActive",
+            "message",
+            "task.create",
+            "task.get",
+            "task.list",
+            "task.cancel"
+          ],
+          "description": "Allowed actions for kilocode adapter."
+        },
+        "agent-scheduler.experimental.agents.kilocode.triggerCommand": {
+          "type": "string",
+          "default": "",
+          "description": "Override command id to trigger kilocode."
+        },
+        "agent-scheduler.experimental.agents.kilocode.listCommand": {
+          "type": "string",
+          "default": "",
+          "description": "Optional command id to list kilocode tasks/history."
+        },
+        "agent-scheduler.experimental.agents.cline.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable cline adapter."
+        },
+        "agent-scheduler.experimental.agents.cline.allowedActions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "trigger",
+              "list",
+              "setActive"
+            ]
+          },
+          "default": [
+            "trigger"
+          ],
+          "description": "Allowed actions for cline adapter."
+        },
+        "agent-scheduler.experimental.agents.cline.triggerCommand": {
+          "type": "string",
+          "default": "",
+          "description": "Override command id to trigger cline."
+        },
+        "agent-scheduler.experimental.agents.cline.listCommand": {
+          "type": "string",
+          "default": "",
+          "description": "Optional command id to list cline tasks/history."
+        },
+        "agent-scheduler.experimental.agents.rooCode.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable rooCode adapter."
+        },
+        "agent-scheduler.experimental.agents.rooCode.allowedActions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "trigger",
+              "list",
+              "setActive"
+            ]
+          },
+          "default": [
+            "trigger"
+          ],
+          "description": "Allowed actions for rooCode adapter."
+        },
+        "agent-scheduler.experimental.agents.rooCode.triggerCommand": {
+          "type": "string",
+          "default": "",
+          "description": "Override command id to trigger rooCode."
+        },
+        "agent-scheduler.experimental.agents.rooCode.listCommand": {
+          "type": "string",
+          "default": "",
+          "description": "Optional command id to list rooCode tasks/history."
+        },
+        "agent-scheduler.experimental.agents.continue.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable continue adapter."
+        },
+        "agent-scheduler.experimental.agents.continue.allowedActions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "trigger",
+              "list",
+              "setActive"
+            ]
+          },
+          "default": [
+            "trigger"
+          ],
+          "description": "Allowed actions for continue adapter."
+        },
+        "agent-scheduler.experimental.agents.continue.triggerCommand": {
+          "type": "string",
+          "default": "",
+          "description": "Override command id to trigger continue."
+        },
+        "agent-scheduler.experimental.agents.continue.listCommand": {
+          "type": "string",
+          "default": "",
+          "description": "Optional command id to list continue tasks/history."
+        },
+        "agent-scheduler.experimental.agents.cursor.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable cursor adapter."
+        },
+        "agent-scheduler.experimental.agents.cursor.allowedActions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "trigger",
+              "list",
+              "setActive"
+            ]
+          },
+          "default": [
+            "trigger"
+          ],
+          "description": "Allowed actions for cursor adapter."
+        },
+        "agent-scheduler.experimental.agents.cursor.triggerCommand": {
+          "type": "string",
+          "default": "",
+          "description": "Override command id to trigger cursor."
+        },
+        "agent-scheduler.experimental.agents.cursor.listCommand": {
+          "type": "string",
+          "default": "",
+          "description": "Optional command id to list cursor tasks/history."
+        },
+        "agent-scheduler.experimental.agents.claudeCode.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable claudeCode adapter."
+        },
+        "agent-scheduler.experimental.agents.claudeCode.allowedActions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "trigger",
+              "list",
+              "setActive"
+            ]
+          },
+          "default": [
+            "trigger"
+          ],
+          "description": "Allowed actions for claudeCode adapter."
+        },
+        "agent-scheduler.experimental.agents.claudeCode.triggerCommand": {
+          "type": "string",
+          "default": "",
+          "description": "Override command id to trigger claudeCode."
+        },
+        "agent-scheduler.experimental.agents.claudeCode.listCommand": {
+          "type": "string",
+          "default": "",
+          "description": "Optional command id to list claudeCode tasks/history."
+        },
+        "agent-scheduler.experimental.agents.geminiCli.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable geminiCli adapter."
+        },
+        "agent-scheduler.experimental.agents.geminiCli.allowedActions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "trigger",
+              "list",
+              "setActive"
+            ]
+          },
+          "default": [
+            "trigger"
+          ],
+          "description": "Allowed actions for geminiCli adapter."
+        },
+        "agent-scheduler.experimental.agents.geminiCli.triggerCommand": {
+          "type": "string",
+          "default": "",
+          "description": "Override command id to trigger geminiCli."
+        },
+        "agent-scheduler.experimental.agents.geminiCli.listCommand": {
+          "type": "string",
+          "default": "",
+          "description": "Optional command id to list geminiCli tasks/history."
+        },
+        "agent-scheduler.experimental.agents.qwenCli.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable qwenCli adapter."
+        },
+        "agent-scheduler.experimental.agents.qwenCli.allowedActions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "trigger",
+              "list",
+              "setActive"
+            ]
+          },
+          "default": [
+            "trigger"
+          ],
+          "description": "Allowed actions for qwenCli adapter."
+        },
+        "agent-scheduler.experimental.agents.qwenCli.triggerCommand": {
+          "type": "string",
+          "default": "",
+          "description": "Override command id to trigger qwenCli."
+        },
+        "agent-scheduler.experimental.agents.qwenCli.listCommand": {
+          "type": "string",
+          "default": "",
+          "description": "Optional command id to list qwenCli tasks/history."
+        },
+        "agent-scheduler.experimental.agents.cursorIDE.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable cursorIDE adapter."
+        },
+        "agent-scheduler.experimental.agents.cursorIDE.allowedActions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "trigger",
+              "list",
+              "setActive"
+            ]
+          },
+          "default": [
+            "trigger"
+          ],
+          "description": "Allowed actions for cursorIDE adapter."
+        },
+        "agent-scheduler.experimental.agents.cursorIDE.triggerCommand": {
+          "type": "string",
+          "default": "",
+          "description": "Override command id to trigger cursorIDE."
+        },
+        "agent-scheduler.experimental.agents.cursorIDE.listCommand": {
+          "type": "string",
+          "default": "",
+          "description": "Optional command id to list cursorIDE tasks/history."
+        },
+        "agent-scheduler.experimental.agents.augmentCode.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable augmentCode adapter."
+        },
+        "agent-scheduler.experimental.agents.augmentCode.allowedActions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "trigger",
+              "list",
+              "setActive"
+            ]
+          },
+          "default": [
+            "trigger"
+          ],
+          "description": "Allowed actions for augmentCode adapter."
+        },
+        "agent-scheduler.experimental.agents.augmentCode.triggerCommand": {
+          "type": "string",
+          "default": "",
+          "description": "Override command id to trigger augmentCode."
+        },
+        "agent-scheduler.experimental.agents.augmentCode.listCommand": {
+          "type": "string",
+          "default": "",
+          "description": "Optional command id to list augmentCode tasks/history."
+        },
+        "agent-scheduler.experimental.agents.claudeCodeChat.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable claudeCodeChat adapter."
+        },
+        "agent-scheduler.experimental.agents.claudeCodeChat.allowedActions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "trigger",
+              "list",
+              "setActive"
+            ]
+          },
+          "default": [
+            "trigger"
+          ],
+          "description": "Allowed actions for claudeCodeChat adapter."
+        },
+        "agent-scheduler.experimental.agents.claudeCodeChat.triggerCommand": {
+          "type": "string",
+          "default": "",
+          "description": "Override command id to trigger claudeCodeChat."
+        },
+        "agent-scheduler.experimental.agents.claudeCodeChat.listCommand": {
+          "type": "string",
+          "default": "",
+          "description": "Optional command id to list claudeCodeChat tasks/history."
+        },
+        "agent-scheduler.experimental.agents.cursorCli.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable cursorCli adapter."
+        },
+        "agent-scheduler.experimental.agents.cursorCli.allowedActions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "trigger",
+              "list",
+              "setActive"
+            ]
+          },
+          "default": [
+            "trigger"
+          ],
+          "description": "Allowed actions for cursorCli adapter."
+        },
+        "agent-scheduler.experimental.agents.cursorCli.triggerCommand": {
+          "type": "string",
+          "default": "",
+          "description": "Override command id to trigger cursorCli."
+        },
+        "agent-scheduler.experimental.agents.cursorCli.listCommand": {
+          "type": "string",
+          "default": "",
+          "description": "Optional command id to list cursorCli tasks/history."
+        },
+        "agent-scheduler.experimental.agents.codexCli.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable codexCli adapter."
+        },
+        "agent-scheduler.experimental.agents.codexCli.allowedActions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "trigger",
+              "list",
+              "setActive"
+            ]
+          },
+          "default": [
+            "trigger"
+          ],
+          "description": "Allowed actions for codexCli adapter."
+        },
+        "agent-scheduler.experimental.agents.codexCli.triggerCommand": {
+          "type": "string",
+          "default": "",
+          "description": "Override command id to trigger codexCli."
+        },
+        "agent-scheduler.experimental.agents.codexCli.listCommand": {
+          "type": "string",
+          "default": "",
+          "description": "Optional command id to list codexCli tasks/history."
+        },
+        "agent-scheduler.experimental.agents.codexOnline.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable codexOnline adapter."
+        },
+        "agent-scheduler.experimental.agents.codexOnline.allowedActions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "trigger",
+              "list",
+              "setActive"
+            ]
+          },
+          "default": [
+            "trigger"
+          ],
+          "description": "Allowed actions for codexOnline adapter."
+        },
+        "agent-scheduler.experimental.agents.codexOnline.triggerCommand": {
+          "type": "string",
+          "default": "",
+          "description": "Override command id to trigger codexOnline."
+        },
+        "agent-scheduler.experimental.agents.codexOnline.listCommand": {
+          "type": "string",
+          "default": "",
+          "description": "Optional command id to list codexOnline tasks/history."
+        },
+        "agent-scheduler.experimental.agents.codexVscode.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable codexVscode adapter."
+        },
+        "agent-scheduler.experimental.agents.codexVscode.allowedActions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "trigger",
+              "list",
+              "setActive"
+            ]
+          },
+          "default": [
+            "trigger"
+          ],
+          "description": "Allowed actions for codexVscode adapter."
+        },
+        "agent-scheduler.experimental.agents.codexVscode.triggerCommand": {
+          "type": "string",
+          "default": "",
+          "description": "Override command id to trigger codexVscode."
+        },
+        "agent-scheduler.experimental.agents.codexVscode.listCommand": {
+          "type": "string",
+          "default": "",
+          "description": "Optional command id to list codexVscode tasks/history."
+        },
+        "agent-scheduler.experimental.agents.googleCodeAssist.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable googleCodeAssist adapter."
+        },
+        "agent-scheduler.experimental.agents.googleCodeAssist.allowedActions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "trigger",
+              "list",
+              "setActive"
+            ]
+          },
+          "default": [
+            "trigger"
+          ],
+          "description": "Allowed actions for googleCodeAssist adapter."
+        },
+        "agent-scheduler.experimental.agents.googleCodeAssist.triggerCommand": {
+          "type": "string",
+          "default": "",
+          "description": "Override command id to trigger googleCodeAssist."
+        },
+        "agent-scheduler.experimental.agents.googleCodeAssist.listCommand": {
+          "type": "string",
+          "default": "",
+          "description": "Optional command id to list googleCodeAssist tasks/history."
+        },
+        "agent-scheduler.experimental.agents.geminiCliCompanion.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable geminiCliCompanion adapter."
+        },
+        "agent-scheduler.experimental.agents.geminiCliCompanion.allowedActions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "trigger",
+              "list",
+              "setActive"
+            ]
+          },
+          "default": [
+            "trigger"
+          ],
+          "description": "Allowed actions for geminiCliCompanion adapter."
+        },
+        "agent-scheduler.experimental.agents.geminiCliCompanion.triggerCommand": {
+          "type": "string",
+          "default": "",
+          "description": "Override command id to trigger geminiCliCompanion."
+        },
+        "agent-scheduler.experimental.agents.geminiCliCompanion.listCommand": {
+          "type": "string",
+          "default": "",
+          "description": "Optional command id to list geminiCliCompanion tasks/history."
+        },
+        "agent-scheduler.experimental.agents.copilot.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable copilot adapter."
+        },
+        "agent-scheduler.experimental.agents.copilot.allowedActions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "trigger",
+              "list",
+              "setActive"
+            ]
+          },
+          "default": [
+            "trigger"
+          ],
+          "description": "Allowed actions for copilot adapter."
+        },
+        "agent-scheduler.experimental.agents.copilot.triggerCommand": {
+          "type": "string",
+          "default": "",
+          "description": "Override command id to trigger copilot."
+        },
+        "agent-scheduler.experimental.agents.copilot.listCommand": {
+          "type": "string",
+          "default": "",
+          "description": "Optional command id to list copilot tasks/history."
+        },
+        "agent-scheduler.experimental.agents.windsurfPlugin.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable windsurfPlugin adapter."
+        },
+        "agent-scheduler.experimental.agents.windsurfPlugin.allowedActions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "trigger",
+              "list",
+              "setActive"
+            ]
+          },
+          "default": [
+            "trigger"
+          ],
+          "description": "Allowed actions for windsurfPlugin adapter."
+        },
+        "agent-scheduler.experimental.agents.windsurfPlugin.triggerCommand": {
+          "type": "string",
+          "default": "",
+          "description": "Override command id to trigger windsurfPlugin."
+        },
+        "agent-scheduler.experimental.agents.windsurfPlugin.listCommand": {
+          "type": "string",
+          "default": "",
+          "description": "Optional command id to list windsurfPlugin tasks/history."
+        },
+        "agent-scheduler.experimental.agents.windsurfIDE.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable windsurfIDE adapter."
+        },
+        "agent-scheduler.experimental.agents.windsurfIDE.allowedActions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "trigger",
+              "list",
+              "setActive"
+            ]
+          },
+          "default": [
+            "trigger"
+          ],
+          "description": "Allowed actions for windsurfIDE adapter."
+        },
+        "agent-scheduler.experimental.agents.windsurfIDE.triggerCommand": {
+          "type": "string",
+          "default": "",
+          "description": "Override command id to trigger windsurfIDE."
+        },
+        "agent-scheduler.experimental.agents.windsurfIDE.listCommand": {
+          "type": "string",
+          "default": "",
+          "description": "Optional command id to list windsurfIDE tasks/history."
+        },
+        "agent-scheduler.experimental.agents.zed.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable zed adapter."
+        },
+        "agent-scheduler.experimental.agents.zed.allowedActions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "trigger",
+              "list",
+              "setActive"
+            ]
+          },
+          "default": [
+            "trigger"
+          ],
+          "description": "Allowed actions for zed adapter."
+        },
+        "agent-scheduler.experimental.agents.zed.triggerCommand": {
+          "type": "string",
+          "default": "",
+          "description": "Override command id to trigger zed."
+        },
+        "agent-scheduler.experimental.agents.zed.listCommand": {
+          "type": "string",
+          "default": "",
+          "description": "Optional command id to list zed tasks/history."
+        },
+        "agent-scheduler.experimental.agents.qodoGen.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable qodoGen adapter."
+        },
+        "agent-scheduler.experimental.agents.qodoGen.allowedActions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "trigger",
+              "list",
+              "setActive"
+            ]
+          },
+          "default": [
+            "trigger"
+          ],
+          "description": "Allowed actions for qodoGen adapter."
+        },
+        "agent-scheduler.experimental.agents.qodoGen.triggerCommand": {
+          "type": "string",
+          "default": "",
+          "description": "Override command id to trigger qodoGen."
+        },
+        "agent-scheduler.experimental.agents.qodoGen.listCommand": {
+          "type": "string",
+          "default": "",
+          "description": "Optional command id to list qodoGen tasks/history."
+        },
+        "agent-scheduler.experimental.agents.qoder.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable qoder adapter."
+        },
+        "agent-scheduler.experimental.agents.qoder.allowedActions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "trigger",
+              "list",
+              "setActive"
+            ]
+          },
+          "default": [
+            "trigger"
+          ],
+          "description": "Allowed actions for qoder adapter."
+        },
+        "agent-scheduler.experimental.agents.qoder.triggerCommand": {
+          "type": "string",
+          "default": "",
+          "description": "Override command id to trigger qoder."
+        },
+        "agent-scheduler.experimental.agents.qoder.listCommand": {
+          "type": "string",
+          "default": "",
+          "description": "Optional command id to list qoder tasks/history."
+        },
+        "agent-scheduler.experimental.agents.amazonQ.enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable amazonQ adapter."
+        },
+        "agent-scheduler.experimental.agents.amazonQ.allowedActions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "trigger",
+              "list",
+              "setActive"
+            ]
+          },
+          "default": [
+            "trigger"
+          ],
+          "description": "Allowed actions for amazonQ adapter."
+        },
+        "agent-scheduler.experimental.agents.amazonQ.triggerCommand": {
+          "type": "string",
+          "default": "",
+          "description": "Override command id to trigger amazonQ."
+        },
+        "agent-scheduler.experimental.agents.amazonQ.listCommand": {
+          "type": "string",
+          "default": "",
+          "description": "Optional command id to list amazonQ tasks/history."
+        }
+      }
+    },
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "agent-scheduler-ActivityBar",
+          "title": "Agent Scheduler",
+          "icon": "assets/icons/activitybar-scheduler.svg"
+        }
+      ]
+    },
+    "views": {
+      "agent-scheduler-ActivityBar": [
+        {
+          "type": "webview",
+          "id": "agent-scheduler.SidebarProvider",
+          "name": "Agent Scheduler"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "agent-scheduler.reloadWindowDev",
+        "title": "Reload Window (Dev Only)",
+        "icon": "$(refresh)",
+        "category": "Developer"
+      },
+      {
+        "command": "agent-scheduler.adapters",
+        "title": "AgentScheduler: Adapters Manager",
+        "category": "Agent Scheduler"
+      },
+      {
+        "command": "agent-scheduler.keysManager",
+        "title": "AgentScheduler: Access Keys Manager",
+        "category": "Agent Scheduler"
+      },
+      {
+        "command": "agent-scheduler.taskManager",
+        "title": "AgentScheduler: Task Manager",
+        "category": "Agent Scheduler"
+      },
+      {
+        "command": "agent-scheduler.getStarted",
+        "title": "AgentScheduler: Get Started",
+        "category": "Agent Scheduler"
+      },
+      {
+        "command": "agent-scheduler.validateSetup",
+        "title": "AgentScheduler: Validate Setup",
+        "category": "Agent Scheduler"
+      },
+      {
+        "command": "agent-scheduler.dspy.optimize",
+        "title": "AgentScheduler: DSPy Optimize Coding Prompt",
+        "category": "Agent Scheduler"
+      },
+      {
+        "command": "agent-scheduler.openAgentScheduler",
+        "title": "Open Agent Scheduler",
+        "icon": {
+          "light": "assets/icons/scheduler-icon-dark.png",
+          "dark": "assets/icons/scheduler-icon-light.png"
+        }
+      },
+      {
+        "command": "agent-scheduler.a2a.trigger",
+        "title": "AgentScheduler: A2A Trigger (Experimental)",
+        "category": "Agent Scheduler"
+      },
+      {
+        "command": "agent-scheduler.a2a.sample",
+        "title": "AgentScheduler: Sample A2A Trigger",
+        "category": "Agent Scheduler"
+      },
+      {
+        "command": "agent-scheduler.grpc.invoke",
+        "title": "AgentScheduler: gRPC A2A Invoke (Experimental)",
+        "category": "Agent Scheduler"
+      },
+      {
+        "command": "agent-scheduler.exportAgentCard",
+        "title": "AgentScheduler: Export Agent Card (Discovery)",
+        "category": "Agent Scheduler"
+      },
+      {
+        "command": "agent-scheduler.mapAgentCommands",
+        "title": "AgentScheduler: Map Agent Commands (Discover & Persist)",
+        "category": "Agent Scheduler"
+      },
+      {
+        "command": "agent-scheduler.auth.createKey",
+        "title": "AgentScheduler: Create Access Key",
+        "category": "Agent Scheduler"
+      },
+      {
+        "command": "agent-scheduler.auth.listKeys",
+        "title": "AgentScheduler: List Access Keys",
+        "category": "Agent Scheduler"
+      },
+      {
+        "command": "agent-scheduler.auth.revokeKey",
+        "title": "AgentScheduler: Revoke Access Key",
+        "category": "Agent Scheduler"
+      },
+      {
+        "command": "agent-scheduler.auth.toggleKey",
+        "title": "AgentScheduler: Toggle Access Key Enabled",
+        "category": "Agent Scheduler"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "agent-scheduler.reloadWindowDev",
+          "group": "navigation@0",
+          "when": "view == agent-scheduler.SidebarProvider && kiloSchedulerDevMode"
+        },
+        {
+          "command": "agent-scheduler.adapters",
+          "group": "navigation@2",
+          "when": "view == agent-scheduler.SidebarProvider"
+        },
+        {
+          "command": "agent-scheduler.keysManager",
+          "group": "navigation@3",
+          "when": "view == agent-scheduler.SidebarProvider"
+        },
+        {
+          "command": "agent-scheduler.getStarted",
+          "group": "navigation@1",
+          "when": "view == agent-scheduler.SidebarProvider"
+        },
+        {
+          "command": "agent-scheduler.validateSetup",
+          "group": "navigation@4",
+          "when": "view == agent-scheduler.SidebarProvider"
+        },
+        {
+          "command": "agent-scheduler.dspy.optimize",
+          "group": "navigation@5",
+          "when": "view == agent-scheduler.SidebarProvider"
+        },
+        {
+          "command": "agent-scheduler.openAgentScheduler",
+          "group": "navigation@9",
+          "when": "view == agent-scheduler.SidebarProvider"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "agent-scheduler.SidebarProvider",
+        "contents": "Welcome to Agent Scheduler.\n[Open Scheduler](command:agent-scheduler.openAgentScheduler) \nConfigure adapters in Settings to enable cross\u2011IDE triggers.",
+        "when": "!config.agent-scheduler.experimental.crossIde"
+      },
+      {
+        "view": "agent-scheduler.SidebarProvider",
+        "contents": "Cross\u2011IDE mode is enabled.\nUse AgentScheduler: Map Agent Commands to discover adapters.",
+        "when": "config.agent-scheduler.experimental.crossIde"
+      }
+    ]
+  },
+  "scripts": {
+    "build": "npm run vsix",
+    "build:webview": "cd webview-ui && npm run build",
+    "build:esbuild": "node esbuild.js --production",
+    "compile": "tsc -p . --outDir out && node esbuild.js",
+    "install:all": "npm install npm-run-all && npm-run-all -l -p install-*",
+    "install-extension": "npm install",
+    "install-webview": "cd webview-ui && npm install",
+    "install-e2e": "cd e2e && npm install",
+    "lint": "npm-run-all -l -p lint:*",
+    "lint:extension": "eslint src --ext ts",
+    "lint:webview": "cd webview-ui && npm run lint",
+    "lint:e2e": "cd e2e && npm run lint",
+    "check-types": "npm-run-all -l -p check-types:*",
+    "check-types:extension": "tsc --noEmit",
+    "check-types:webview": "cd webview-ui && npm run check-types",
+    "check-types:e2e": "cd e2e && npm run check-types",
+    "package": "npm-run-all -l -p build:webview build:esbuild check-types lint",
+    "pretest": "npm run compile",
+    "dev": "cd webview-ui && npm run dev",
+    "test": "npm run test:extension && npm run test:webview",
+    "test:extension": "jest",
+    "test:webview": "cd webview-ui && npm run test",
+    "test:e2e": "npm run vscode-test && cd e2e && npm run test",
+    "test:kiloservice": "npm run vscode-test && cd e2e && npm run test:kiloservice",
+    "test:e2e:all": "npm run vscode-test && cd e2e && npm run test:all",
+    "prepare": "husky",
+    "publish:marketplace": "vsce publish && ovsx publish",
+    "publish": "npm run build && changeset publish && npm install --package-lock-only",
+    "version-packages": "changeset version && npm install --package-lock-only",
+    "vscode:prepublish": "npm run build:webview && npm run build:esbuild",
+    "vsix": "rimraf bin && mkdirp bin && npx vsce package --out bin",
+    "watch": "npm-run-all -l -p watch:*",
+    "watch:esbuild": "node esbuild.js --watch",
+    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "changeset": "changeset",
+    "knip": "knip --include files",
+    "clean": "npm-run-all -l -p clean:*",
+    "clean:extension": "rimraf bin dist out",
+    "clean:webview": "cd webview-ui && npm run clean",
+    "clean:e2e": "cd e2e && npm run clean",
+    "vscode-test": "npm-run-all -l -p vscode-test:*",
+    "vscode-test:extension": "tsc -p . --outDir out && node esbuild.js",
+    "vscode-test:webview": "cd webview-ui && npm run build",
+    "update-contributors": "node scripts/update-contributors.js",
+    "generate-types": "tsx scripts/generate-types.mts"
+  },
+  "dependencies": {
+    "@anthropic-ai/bedrock-sdk": "^0.12.5",
+    "@anthropic-ai/sdk": "^0.37.0",
+    "@anthropic-ai/vertex-sdk": "^0.7.0",
+    "@aws-sdk/client-bedrock-runtime": "^3.817.0",
+    "@genkit-ai/mcp": "^1.18.0",
+    "@google-cloud/vertexai": "^1.9.3",
+    "@google/generative-ai": "^0.18.0",
+    "@grpc/grpc-js": "^1.11.3",
+    "@grpc/proto-loader": "^0.7.13",
+    "@mistralai/mistralai": "^1.3.6",
+    "@modelcontextprotocol/sdk": "^1.7.0",
+    "@types/clone-deep": "^4.0.4",
+    "@types/pdf-parse": "^1.1.4",
+    "@types/tmp": "^0.2.6",
+    "@types/turndown": "^5.0.5",
+    "@types/vscode": "^1.95.0",
+    "@vscode/codicons": "^0.0.36",
+    "axios": "^1.7.4",
+    "cheerio": "^1.0.0",
+    "chokidar": "^4.0.1",
+    "clone-deep": "^4.0.1",
+    "default-shell": "^2.2.0",
+    "delay": "^6.0.0",
+    "diff": "^7.0.0",
+    "diff-match-patch": "^1.0.5",
+    "fast-deep-equal": "^3.1.3",
+    "fast-xml-parser": "^4.5.1",
+    "fastest-levenshtein": "^1.0.16",
+    "fzf": "^0.5.2",
+    "get-folder-size": "^5.0.0",
+    "globby": "^14.0.2",
+    "i18next": "^24.2.2",
+    "isbinaryfile": "^5.0.2",
+    "js-tiktoken": "^1.0.19",
+    "mammoth": "^1.8.0",
+    "monaco-vscode-textmate-theme-converter": "^0.1.7",
+    "node-ipc": "^12.0.0",
+    "openai": "^4.78.1",
+    "os-name": "^6.0.0",
+    "p-wait-for": "^5.0.2",
+    "pdf-parse": "^1.1.1",
+    "pkce-challenge": "^4.1.0",
+    "posthog-node": "^4.7.0",
+    "pretty-bytes": "^6.1.1",
+    "puppeteer-chromium-resolver": "^23.0.0",
+    "puppeteer-core": "^23.4.0",
+    "reconnecting-eventsource": "^1.6.4",
+    "say": "^0.16.0",
+    "serialize-error": "^12.0.0",
+    "simple-git": "^3.27.0",
+    "sound-play": "^1.1.0",
+    "string-similarity": "^4.0.4",
+    "strip-ansi": "^7.1.0",
+    "strip-bom": "^5.0.0",
+    "tmp": "^0.2.3",
+    "turndown": "^7.2.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^2.27.10",
+    "@changesets/types": "^6.0.0",
+    "@dotenvx/dotenvx": "^1.41.0",
+    "@types/debug": "^4.1.12",
+    "@types/diff": "^7.0.2",
+    "@types/diff-match-patch": "^1.0.36",
+    "@types/glob": "^8.1.0",
+    "@types/jest": "^29.5.14",
+    "@types/node": "20.x",
+    "@types/node-ipc": "^9.2.3",
+    "@types/string-similarity": "^4.0.2",
+    "@typescript-eslint/eslint-plugin": "^8.30.1",
+    "@typescript-eslint/parser": "^8.32.1",
+    "@vscode/vsce": "^3.3.2",
+    "esbuild": "^0.25.2",
+    "eslint": "^9.25.1",
+    "execa": "^9.5.2",
+    "glob": "^11.0.1",
+    "husky": "^9.1.7",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "jest-simple-dot-reporter": "^1.0.5",
+    "knip": "^5.44.4",
+    "lint-staged": "^15.2.11",
+    "mkdirp": "^3.0.1",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^3.5.3",
+    "rimraf": "^6.0.1",
+    "ts-jest": "^29.2.5",
+    "tsup": "^8.4.0",
+    "tsx": "^4.19.3",
+    "typescript": "^5.4.5",
+    "zod-to-ts": "^1.2.0"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx,json,css,md}": [
+      "prettier --write"
+    ],
+    "src/**/*.{ts,tsx}": [
+      "npx eslint -c .eslintrc.json --max-warnings=0 --fix"
+    ],
+    "webview-ui/**/*.{ts,tsx}": [
+      "npx eslint -c webview-ui/.eslintrc.json --max-warnings=0 --fix"
+    ]
+  }
 }
-
-
-

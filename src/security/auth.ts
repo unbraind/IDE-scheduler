@@ -69,6 +69,20 @@ export async function setKeyEnabled(context: vscode.ExtensionContext, id: string
   return true
 }
 
+export async function updateKey(context: vscode.ExtensionContext, id: string, patch: Partial<Pick<KeyRecord, 'label'|'expiresAt'|'scopes'>>): Promise<boolean> {
+  const list = await listKeys(context)
+  const rec = list.find(k => k.id === id)
+  if (!rec) return false
+  if (typeof patch.label === 'string') rec.label = patch.label
+  if (typeof patch.expiresAt === 'string' || patch.expiresAt === undefined) rec.expiresAt = patch.expiresAt
+  if (patch.scopes) {
+    if (Array.isArray(patch.scopes.transports)) rec.scopes.transports = patch.scopes.transports
+    if (Array.isArray(patch.scopes.actions)) rec.scopes.actions = patch.scopes.actions
+  }
+  await context.globalState.update(META_KEY, list)
+  return true
+}
+
 export async function authorize(context: vscode.ExtensionContext, transport: Transport, action: string, token?: string): Promise<{ ok: boolean; error?: string }> {
   const required = getSetting<boolean>(`experimental.auth.${transport}.required`) ?? false
   if (!required) return { ok: true }
@@ -89,4 +103,3 @@ export async function authorize(context: vscode.ExtensionContext, transport: Tra
   }
   return { ok: false, error: 'invalid-token' }
 }
-

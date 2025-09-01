@@ -9,6 +9,14 @@
 
 Agent Scheduler brings cross‑IDE Agent‑to‑Agent (A2A) orchestration into VS Code with multiple transports (gRPC, HTTP JSON, MCP), pluggable adapters (Kilo Code, Cline, Roo Code, Continue, Cursor, Claude Code, …), and a secure access‑key model. It also includes the original robust task‑scheduling features.
 
+What’s new in this update
+- Activity Bar container/icon fixed and theme‑adaptive
+- “Get Started” onboarding webview with deep‑links to settings and mapping
+- “Validate Setup” dashboard webview with detailed checks
+- Settings surface simplified to `agent-scheduler.*` only (legacy UI removed)
+- MCP tools extended for invoke/message/tasks
+- Generic command adapters for many IDEs/agents via configured command IDs
+
 Important: This project is a fork of [kyle-apex/roo-scheduler](https://github.com/kyle-apex/roo-scheduler). All credit for the original Scheduler concept and implementation belongs to that project. This fork adapts the extension to work natively with Kilo Code (IDs, APIs, config, assets) and maintains feature parity where possible.
 
 ## Key Features
@@ -30,7 +38,46 @@ Important: This project is a fork of [kyle-apex/roo-scheduler](https://github.co
 
 - gRPC A2A: a2a.v1.A2AService with Invoke, SendMessage, CreateTask, GetTask, ListTasks, CancelTask (see `src/protocols/grpc/a2a.proto`).
 - HTTP A2A: JSON endpoints at basePath (default `/a2a`): `/.well-known/agent-card`, `/invoke`, `/sendMessage`, `/tasks/*`.
-- MCP: HTTP Stream transport exposing tool `a2a.invoke` using `@modelcontextprotocol/sdk`.
+- MCP: HTTP Stream transport exposing tools `a2a.invoke`, `a2a.message`, `a2a.task.create|get|list|cancel` using `@modelcontextprotocol/sdk`.
+
+### Adapters & Keys Management UI
+
+- “Adapters Manager” (AgentScheduler: Adapters Manager): toggle adapters on/off, edit `triggerCommand`/`listCommand`, and `allowedActions`, plus run a one‑click trigger test.
+- “Access Keys Manager” (AgentScheduler: Access Keys Manager): create, enable/disable, edit label, transports and actions scope, set expiry, revoke. Keys are hashed and never shown again; the token is copied to clipboard at creation.
+
+### DSPy + GEPA (experimental)
+
+- “DSPy Optimize Coding Prompt” (AgentScheduler: DSPy Optimize Coding Prompt): runs a tiny Python bridge that uses DSPy (MIPROv2 or GEPA) to optimize instructions for coding prompts using your small JSONL dataset (input/output pairs). Resulting prompt is saved to a file and opened in VS Code. Configure your Python environment to have `dspy` installed. See docs/dspy-gepa.md for usage.
+
+
+## Getting Started
+
+Open the sidebar “Agent Scheduler”, then run “AgentScheduler: Get Started”. It walks through enabling Cross‑IDE, auto‑mapping commands, configuring adapters (enable/allowedActions/trigger/list), enabling HTTP/gRPC/MCP, securing endpoints with access keys, exporting an Agent Card, generating a mapping report, and opening the validation dashboard.
+
+## Validate Setup
+
+Run “AgentScheduler: Validate Setup” for a dashboard that checks: view registration, cross‑IDE state and discovery results, activity badge state/count, HTTP/gRPC reachability (if enabled), and MCP HTTP listening.
+
+## Settings (high‑level)
+
+All settings live under `agent-scheduler.*`.
+
+- `experimental.activityBadge`: Show active‑schedule count on the Activity Bar icon.
+- `experimental.crossIde`: Enable adapters for other IDEs/agents and A2A triggers.
+- `experimental.autoMapOnStartup`: Auto‑discover agent commands at activation.
+
+Endpoints
+- `experimental.http.*`: Enable/host/port/basePath for HTTP A2A.
+- `experimental.grpc.*`: Enable/host/port for gRPC A2A and optional client target.
+- `experimental.mcp.*`: Enable MCP, forwarding, endpoint URL, and optional local HTTP transport.
+
+Auth
+- `experimental.auth.(http|grpc|mcp).required`: Require an access key per transport (Create/List/Revoke/Toggle via commands).
+
+Adapters
+- `experimental.agents.<adapter>.(enabled|allowedActions|triggerCommand|listCommand)`
+- Built‑ins: kilocode, cline, rooCode, continue, cursor, claudeCode, geminiCli, qwenCli
+- Generic (config‑only): cursorIDE, augmentCode, claudeCodeChat, cursorCli, codexCli, codexOnline, codexVscode, googleCodeAssist, geminiCliCompanion, copilot, windsurfPlugin, windsurfIDE, zed, qodoGen, qoder, amazonQ
 
 ### Security: Access Keys
 

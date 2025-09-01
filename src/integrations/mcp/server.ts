@@ -31,8 +31,8 @@ export async function startMcpA2AEndpoint(_context: vscode.ExtensionContext) {
 
     const server = new McpServer({ name: 'agent-scheduler-mcp' })
 
-    // Define tool schema with zod for validation (loosely matches our A2A shape)
-    const inputSchema = z.object({
+    // Define tool schemas with zod for validation (loosely match our A2A shapes)
+    const invokeSchema = z.object({
       protocol: z.literal('a2a'),
       version: z.string().default('1'),
       target: z.object({ agent: z.string() }),
@@ -42,10 +42,69 @@ export async function startMcpA2AEndpoint(_context: vscode.ExtensionContext) {
 
     server.tool('a2a.invoke', {
       description: 'Invoke an Agent-to-Agent (A2A) action within Agent Scheduler',
-      inputSchema,
+      inputSchema: invokeSchema,
       handler: async (args: unknown) => {
-        const parsed = inputSchema.parse(args)
+        const parsed = invokeSchema.parse(args)
         const res = await handleA2ATrigger(parsed)
+        return { content: [{ type: 'text', text: JSON.stringify(res) }] }
+      },
+    })
+
+    // Messaging tool
+    const messageSchema = z.object({
+      target: z.object({ agent: z.string() }),
+      channel: z.string().optional(),
+      text: z.string(),
+      metadata: z.record(z.any()).optional(),
+    })
+    server.tool('a2a.message', {
+      description: 'Send a message to an agent via Agent Scheduler',
+      inputSchema: messageSchema,
+      handler: async (args: unknown) => {
+        const { target, channel, text, metadata } = messageSchema.parse(args)
+        const res = await (await import('../../protocols/a2a')).handleSendMessage({ agent: target.agent, channel, text, metadata })
+        return { content: [{ type: 'text', text: JSON.stringify(res) }] }
+      },
+    })
+
+    // Task tools
+    const createTaskSchema = z.object({ target: z.object({ agent: z.string() }), title: z.string().optional(), params: z.record(z.any()).optional() })
+    server.tool('a2a.task.create', {
+      description: 'Create a task via Agent Scheduler',
+      inputSchema: createTaskSchema,
+      handler: async (args: unknown) => {
+        const { target, title, params } = createTaskSchema.parse(args)
+        const res = await (await import('../../protocols/a2a')).handleCreateTask({ agent: target.agent, title, params })
+        return { content: [{ type: 'text', text: JSON.stringify(res) }] }
+      },
+    })
+    const getTaskSchema = z.object({ target: z.object({ agent: z.string() }), id: z.string() })
+    server.tool('a2a.task.get', {
+      description: 'Get a task via Agent Scheduler',
+      inputSchema: getTaskSchema,
+      handler: async (args: unknown) => {
+        const { target, id } = getTaskSchema.parse(args)
+        const res = await (await import('../../protocols/a2a')).handleGetTask({ agent: target.agent, id })
+        return { content: [{ type: 'text', text: JSON.stringify(res) }] }
+      },
+    })
+    const listTaskSchema = z.object({ target: z.object({ agent: z.string() }), filter: z.string().optional(), options: z.record(z.any()).optional() })
+    server.tool('a2a.task.list', {
+      description: 'List tasks via Agent Scheduler',
+      inputSchema: listTaskSchema,
+      handler: async (args: unknown) => {
+        const { target, filter, options } = listTaskSchema.parse(args)
+        const res = await (await import('../../protocols/a2a')).handleListTasks({ agent: target.agent, filter, options })
+        return { content: [{ type: 'text', text: JSON.stringify(res) }] }
+      },
+    })
+    const cancelTaskSchema = z.object({ target: z.object({ agent: z.string() }), id: z.string() })
+    server.tool('a2a.task.cancel', {
+      description: 'Cancel a task via Agent Scheduler',
+      inputSchema: cancelTaskSchema,
+      handler: async (args: unknown) => {
+        const { target, id } = cancelTaskSchema.parse(args)
+        const res = await (await import('../../protocols/a2a')).handleCancelTask({ agent: target.agent, id })
         return { content: [{ type: 'text', text: JSON.stringify(res) }] }
       },
     })

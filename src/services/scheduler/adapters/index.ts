@@ -8,7 +8,11 @@ import { CursorAdapter } from './CursorAdapter'
 import { ClaudeCodeAdapter } from './ClaudeCodeAdapter'
 import { GeminiCliAdapter } from './GeminiCliAdapter'
 import { QwenCoderCliAdapter } from './QwenCoderCliAdapter'
+import { CopilotAdapter } from './CopilotAdapter'
+import { AmazonQAdapter } from './AmazonQAdapter'
+import { ZedAdapter } from './ZedAdapter'
 import { discoverAgentCommands } from '../AgentCommandMapper'
+import { GenericCommandAdapter } from './GenericCommandAdapter'
 
 export class SchedulerAdapterRegistry {
   private static _instance: SchedulerAdapterRegistry
@@ -38,9 +42,21 @@ export class SchedulerAdapterRegistry {
       if (enabled('rooCode')) creations.push(new RooCodeAdapter())
       if (enabled('continue')) creations.push(new ContinueAdapter())
       if (enabled('cursor')) creations.push(new CursorAdapter())
+      if (enabled('copilot')) creations.push(new CopilotAdapter())
+      if (enabled('amazonQ')) creations.push(new AmazonQAdapter())
+      if (enabled('zed')) creations.push(new ZedAdapter())
       if (enabled('claudeCode')) creations.push(new ClaudeCodeAdapter())
       if (enabled('geminiCli')) creations.push(new GeminiCliAdapter())
       if (enabled('qwenCli')) creations.push(new QwenCoderCliAdapter())
+
+      // Generic adapters (config-only) — provide trigger/list command IDs in settings
+      const genericIds = [
+        'cursorIDE','augmentCode','claudeCodeChat','cursorCli','codexCli','codexOnline','codexVscode',
+        'googleCodeAssist','geminiCliCompanion','copilot','windsurfPlugin','windsurfIDE','zed','qodoGen','qoder','amazonQ'
+      ]
+      for (const id of genericIds) {
+        if (enabled(id)) creations.push(new GenericCommandAdapter(id))
+      }
 
       for (const adapter of creations) {
         this.adapters.set(adapter.id, adapter)

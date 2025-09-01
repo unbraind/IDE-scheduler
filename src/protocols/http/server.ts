@@ -98,14 +98,29 @@ export function buildAgentCard() {
   const mcpHttpEnabled = getSetting<boolean>('experimental.mcp.http.enabled') ?? false
   const mcpHttpPort = getSetting<number>('experimental.mcp.http.port') ?? 4025
   const mcpHttpPath = getSetting<string>('experimental.mcp.http.path') ?? '/mcp'
+  const tools = {
+    'a2a.invoke': {
+      description: 'Invoke an A2A action',
+      input: { type: 'object', properties: { protocol: {const:'a2a'}, version:{type:'string'}, target:{type:'object', properties:{agent:{type:'string'}}, required:['agent']}, action:{enum:['trigger','list','setActive']}, payload:{type:'object'} }, required:['protocol','version','target','action'] }
+    },
+    'a2a.message': {
+      description: 'Send a message to an agent',
+      input: { type: 'object', properties: { target:{type:'object', properties:{agent:{type:'string'}}, required:['agent']}, channel:{type:'string'}, text:{type:'string'}, metadata:{type:'object'} }, required:['target','text'] }
+    },
+    'a2a.task.create': { description:'Create a task', input:{ type:'object', properties:{ target:{type:'object', properties:{agent:{type:'string'}}, required:['agent']}, title:{type:'string'}, params:{type:'object'} }, required:['target'] } },
+    'a2a.task.get':    { description:'Get a task',    input:{ type:'object', properties:{ target:{type:'object', properties:{agent:{type:'string'}}, required:['agent']}, id:{type:'string'} }, required:['target','id'] } },
+    'a2a.task.list':   { description:'List tasks',    input:{ type:'object', properties:{ target:{type:'object', properties:{agent:{type:'string'}}, required:['agent']}, filter:{type:'string'}, options:{type:'object'} }, required:['target'] } },
+    'a2a.task.cancel': { description:'Cancel a task',  input:{ type:'object', properties:{ target:{type:'object', properties:{agent:{type:'string'}}, required:['agent']}, id:{type:'string'} }, required:['target','id'] } },
+  }
   return {
     name: 'Agent Scheduler',
-    version: '0.0.17',
-    capabilities: ['a2a.invoke','message','task.create','task.get','task.list','task.cancel'],
+    version: '0.0.19',
+    authentication: ['ApiKey'],
+    skills: ['a2a.invoke','message','task.create','task.get','task.list','task.cancel'],
     transports: {
       http: httpEnabled ? { base: `http://${httpHost}:${httpPort}${httpBase}` } : undefined,
       grpc: grpcEnabled ? { host: grpcHost, port: grpcPort, service: 'a2a.v1.A2AService' } : undefined,
-      mcp: (mcpEnabled && mcpHttpEnabled) ? { url: `http://127.0.0.1:${mcpHttpPort}${mcpHttpPath}`, tools: ['a2a.invoke'] } : undefined,
+      mcp: (mcpEnabled && mcpHttpEnabled) ? { url: `http://127.0.0.1:${mcpHttpPort}${mcpHttpPath}`, tools } : undefined,
     },
   }
 }
