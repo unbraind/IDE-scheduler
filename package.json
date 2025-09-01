@@ -1183,12 +1183,12 @@
     "string-similarity": "^4.0.4",
     "strip-ansi": "^7.1.0",
     "strip-bom": "^5.0.0",
-    "tmp": "^0.2.3",
+    "tmp": "^0.2.5",
     "turndown": "^7.2.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@changesets/cli": "^2.27.10",
+    "@changesets/cli": "^2.29.6",
     "@changesets/types": "^6.0.0",
     "@dotenvx/dotenvx": "^1.41.0",
     "@types/debug": "^4.1.12",
@@ -1202,7 +1202,7 @@
     "@typescript-eslint/eslint-plugin": "^8.30.1",
     "@typescript-eslint/parser": "^8.32.1",
     "@vscode/vsce": "^3.3.2",
-    "esbuild": "^0.25.2",
+    "esbuild": "^0.25.9",
     "eslint": "^9.25.1",
     "execa": "^9.5.2",
     "glob": "^11.0.1",
