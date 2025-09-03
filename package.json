@@ -1162,7 +1162,7 @@
     "globby": "^14.0.2",
     "i18next": "^24.2.2",
     "isbinaryfile": "^5.0.2",
-    "js-tiktoken": "^1.0.19",
+    "js-tiktoken": "^1.0.21",
     "mammoth": "^1.8.0",
     "monaco-vscode-textmate-theme-converter": "^0.1.7",
     "node-ipc": "^12.0.0",
