@@ -1199,7 +1199,7 @@
     "@types/node": "20.x",
     "@types/node-ipc": "^9.2.3",
     "@types/string-similarity": "^4.0.2",
-    "@typescript-eslint/eslint-plugin": "^8.30.1",
+    "@typescript-eslint/eslint-plugin": "^8.42.0",
     "@typescript-eslint/parser": "^8.32.1",
     "@vscode/vsce": "^3.3.2",
     "esbuild": "^0.25.2",
